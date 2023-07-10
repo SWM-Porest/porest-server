@@ -31,7 +31,7 @@ jobs:
       - name: Checkout repo
         uses: actions/checkout@v3
       - name: Configure AWS credentials
-        uses: aws-actions/configure-aws-credentials@v2
+        uses: aws-actions/configure-aws-credentials@v1
         with:
           role-to-assume: arn:aws:iam::467825347611:role/GitHubAction-AssumeRoleWithAction
           aws-region: ${{ env.AWS_REGION }}
