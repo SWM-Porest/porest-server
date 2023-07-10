@@ -5,10 +5,10 @@ on:
       branches: ["main"]
       
 env:
-  REGISTRY: ghcr.io
   IMAGE_NAME: ${{ github.repository }}
   DOCKER_CONTAINER: app
   DOCKER_NETWORK: porest-network
+  AWS_REGION: <"ap-northeast-2">
   
 jobs:
   test:
@@ -24,3 +24,26 @@ jobs:
           registry-url: https://npm.pkg.github.com/
       - run: npm install
       - run: npm run test
+  build:
+    needs: test
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout repo
+        uses: actions/checkout@v3
+
+      - name: Configure AWS credentials
+        uses: aws-actions/configure-aws-credentials@v2 # More information on this action can be found below in the 'AWS Credentials' section
+        with:
+          role-to-assume: ${{ secrets.ROLE_AWS_ARN }}
+          aws-region: ${{ env.AWS_REGION }}
+      - name: Login to Amazon ECR Private
+        id: login-ecr
+        uses: aws-actions/amazon-ecr-login@v1
+      - name: Build, tag, and push docker image to Amazon ECR
+        env:
+          REGISTRY: ${{ steps.login-ecr.outputs.registry }}
+          REPOSITORY: porest/nestjs
+          IMAGE_TAG: ${{ github.sha }}
+        run: |
+          docker build -t $REGISTRY/$REPOSITORY:$IMAGE_TAG .
+          docker push $REGISTRY/$REPOSITORY:$IMAGE_TAG
