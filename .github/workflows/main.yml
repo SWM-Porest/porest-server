@@ -51,8 +51,5 @@ jobs:
         run: |
           docker build -t ${{ env.REGISTRY }}/${{ env.REPOSITORY }}:${{ env.IMAGE_TAG }} .
           docker push ${{ env.REGISTRY }}/${{ env.REPOSITORY }}:${{ env.IMAGE_TAG }} 
-  deploy:
-    needs: build
-    runs-on: self-hosted
     
     
