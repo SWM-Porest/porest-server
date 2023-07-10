@@ -66,8 +66,8 @@ jobs:
         id: login-ecr
         uses: aws-actions/amazon-ecr-login@v1
       - name: Stop and Remove running Container and Images
-        run: 
-          ( docker stop ${{ env.DOCKER_CONTAINER }} || true ) && ( docker rm ${{ env.DOCKER_CONTAINER }} || true ) && ( docker rmi ${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}:latest || true )
+        run: |
+          ( docker stop ${{ env.DOCKER_CONTAINER }} || true ) && ( docker rm ${{ env.DOCKER_CONTAINER }} || true ) && ( docker rmi ${{ env.REGISTRY }}/${{ env.REPOSITORY }}:${{ env.IMAGE_TAG }} || true )
       - name: Run Docker
         env:
           REGISTRY: ${{ steps.login-ecr.outputs.registry }}
