@@ -54,7 +54,7 @@ jobs:
   
   deploy:
     needs: build
-    runs-on: self-hosted
+    runs-on: [self-hosted, label-porest-server]
     steps:
       - name: Configure AWS credentials
         uses: aws-actions/configure-aws-credentials@v2
