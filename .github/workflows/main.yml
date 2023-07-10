@@ -8,7 +8,7 @@ env:
   IMAGE_NAME: ${{ github.repository }}
   DOCKER_CONTAINER: app
   DOCKER_NETWORK: porest-network
-  AWS_REGION: <"ap-northeast-2">
+  AWS_REGION: ap-northeast-2
   
 jobs:
   test:
