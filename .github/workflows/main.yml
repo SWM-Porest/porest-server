@@ -50,4 +50,28 @@ jobs:
           IMAGE_TAG: ${{ github.sha }}
         run: |
           docker build -t ${{ env.REGISTRY }}/${{ env.REPOSITORY }}:${{ env.IMAGE_TAG }} .
-          docker push ${{ env.REGISTRY }}/${{ env.REPOSITORY }}:${{ env.IMAGE_TAG }} 
+          docker push ${{ env.REGISTRY }}/${{ env.REPOSITORY }}:${{ env.IMAGE_TAG }}
+  
+  deploy:
+    needs: build
+    runs-on: self-hosted
+    steps:
+      - name: Configure AWS credentials
+        uses: aws-actions/configure-aws-credentials@v2
+        with:
+          role-to-assume: ${{ secrets.AWS_ROLE_ARN }}
+          role-session-name: GitHub_to_AWS_via_FederatedOIDC
+          aws-region: ${{ env.AWS_REGION }}
+      - name: Login to Amazon ECR Private
+        id: login-ecr
+        uses: aws-actions/amazon-ecr-login@v1
+      - name: Stop and Remove running Container and Images
+        run: 
+          ( docker stop ${{ env.DOCKER_CONTAINER }} || true ) && ( docker rm ${{ env.DOCKER_CONTAINER }} || true ) && ( docker rmi ${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}:latest || true )
+      - name: Run Docker
+        env:
+          REGISTRY: ${{ steps.login-ecr.outputs.registry }}
+          REPOSITORY: porest/nestjs
+          IMAGE_TAG: ${{ github.sha }}
+        run: |
+          docker run --name ${{ env.DOCKER_CONTAINER }} -d -p 80:3000 --restart always ${{ env.REGISTRY }}/${{ env.REPOSITORY }}:${{ env.IMAGE_TAG }}
