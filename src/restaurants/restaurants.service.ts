@@ -1,32 +1,41 @@
-import { Injectable } from '@nestjs/common';
+import { Injectable, NotFoundException } from '@nestjs/common';
 import { CreateRestaurantsDto } from './dto/create-restaurants.dto';
 import { UpdateRestaurantsDto } from './dto/update-restaurants.dto';
-import { InjectModel } from '@nestjs/mongoose';
-import { Restaurant } from './schemas/restaurants.schema';
-import { Model } from 'mongoose';
+import { Types } from 'mongoose';
+import { RestaurantRepository } from './restaurants.repository';
 
 @Injectable()
 export class RestaurantsService {
-    constructor(@InjectModel(Restaurant.name) private restaurantModel: Model<Restaurant>) {}
-
-    create(CreateRestaurantsDto: CreateRestaurantsDto) {
-        const createdRestaurant = new this.restaurantModel(CreateRestaurantsDto);
-        return createdRestaurant.save();
+    constructor(private readonly restaurantRepository: RestaurantRepository) {}
+    
+    async create(createRestaurantsDto: CreateRestaurantsDto) {
+        return this.restaurantRepository.createRestaurant(createRestaurantsDto);
     }
 
     findAll() {
         return 'Find All Restaurants';
     }
 
-    findOne(id: number) {
-        return `Find Restaurants with id${id}`;
+    async findOne(_id: string) {
+        if (Types.ObjectId.isValid(_id)) {
+            const findRestaurant = this.restaurantRepository.findOneRestaurant(_id);
+            if (findRestaurant) {
+                return findRestaurant
+            } else{
+                throw new NotFoundException(null);
+            }
+        } else {
+            throw new NotFoundException(null);
+        }
+        
+         
     }
 
-    update(id: number, updateRestaurantsDto: UpdateRestaurantsDto) {
-        return `Update Restaurant with id${id}`;
+    update(_id: string, updateRestaurantsDto: UpdateRestaurantsDto) {
+        return `Update Restaurant with id${_id}`;
     }
 
-    remove(id: number) {
-        return `Remove Restaurant with id${id}`;
+    remove(_id: string) {
+        return `Remove Restaurant with id${_id}`;
     }
 }

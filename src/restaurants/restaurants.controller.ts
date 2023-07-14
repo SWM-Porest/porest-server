@@ -14,22 +14,23 @@ export class RestaurantsController {
 
     @Get()
     findAll() {
+
         return this.restaurantService.findAll();
     }
     
     @Get(':id')
     findOne(@Param('id') id: string) {
-        return this.restaurantService.findOne(+id);
+        return this.restaurantService.findOne(id);
     }
     
     @Patch(':id')
     update(@Param('id') id: string, @Body() updateRestaurantsDto: UpdateRestaurantsDto) {
-        return this.restaurantService.update(+id, updateRestaurantsDto);
+        return this.restaurantService.update(id, updateRestaurantsDto);
     }
     
     @Delete(':id')
     remove(@Param('id') id: string) {
-        return this.restaurantService.remove(+id);
+        return this.restaurantService.remove(id);
     }
     
     

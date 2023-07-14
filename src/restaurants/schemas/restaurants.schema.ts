@@ -4,6 +4,16 @@ import { Date, HydratedDocument } from "mongoose";
 export type RestaurantsDocument = HydratedDocument<Restaurant>;
 
 @Schema()
+export class option {
+
+}
+
+@Schema()
+export class Menu {
+
+}
+
+@Schema()
 export class Restaurant {
     @Prop({ required: true, index: true })
     name: string;
@@ -25,6 +35,9 @@ export class Restaurant {
 
     @Prop()
     status: number
+
+    @Prop()
+    menus: Menu
 }
 
 export const RestaurantsSchema = SchemaFactory.createForClass(Restaurant);
