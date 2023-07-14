@@ -11,6 +11,9 @@ ADD . /app
 # 의존성 설치
 RUN npm install
 
+# pm2 설치
+RUN npm install pm2 -g
+
 # nest.js 빌드
 RUN npm run build
 
@@ -18,4 +21,4 @@ RUN npm run build
 EXPOSE 3000
 
 # 실행
-ENTRYPOINT npm run start:prod
+ENTRYPOINT pm2 start ecosystem.config.js --no-daemon
