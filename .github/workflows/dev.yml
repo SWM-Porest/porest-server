@@ -2,7 +2,7 @@ name: porest-server dev ci
 
 on:
   push:
-    branches: [ 'dev' ]
+    branches: [ "dev" ]
     
 jobs:
   test:
