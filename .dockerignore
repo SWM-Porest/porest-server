@@ -17,3 +17,7 @@ Dockerfile
 README.md
 tslint.json
 nodemon.json
+
+# Prettier and ESLint
+.eslintrc.js
+.prettierrc.js
