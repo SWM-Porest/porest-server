@@ -22,11 +22,15 @@ export class CreateRestaurantsDto {
 }
 
 export class CreateMenusDto {
+  @IsNotEmpty()
   name: string;
 
   en_name: string;
 
   content: string;
+
+  @IsNotEmpty()
+  price: number;
 
   created_at: Date;
 
