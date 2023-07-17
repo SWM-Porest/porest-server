@@ -1,12 +1,6 @@
 import { Injectable, NotFoundException } from '@nestjs/common';
-import {
-  CreateMenusDto,
-  CreateRestaurantsDto,
-} from './dto/create-restaurants.dto';
-import {
-  UpdateMenusDto,
-  UpdateRestaurantsDto,
-} from './dto/update-restaurants.dto';
+import { CreateMenusDto, CreateRestaurantsDto } from './dto/create-restaurants.dto';
+import { UpdateMenusDto, UpdateRestaurantsDto } from './dto/update-restaurants.dto';
 import { Types } from 'mongoose';
 import { RestaurantRepository } from './restaurants.repository';
 
@@ -24,14 +18,14 @@ export class RestaurantsService {
 
   async findOne(_id: string) {
     if (Types.ObjectId.isValid(_id)) {
-      const findRestaurant = this.restaurantRepository.findOneRestaurant(_id);
+      const findRestaurant = await this.restaurantRepository.findOneRestaurant(_id);
       if (findRestaurant) {
         return findRestaurant;
       } else {
-        throw new NotFoundException('Not Found Restaurant1');
+        throw new NotFoundException(`Not exist ${_id}`);
       }
     } else {
-      throw new NotFoundException('Not Found Restaurant2');
+      throw new NotFoundException('Invalid ID');
     }
   }
 
@@ -42,13 +36,9 @@ export class RestaurantsService {
   async addMenu(_id: string, createMenusDto: CreateMenusDto) {
     const restaurant = await this.findOne(_id);
     if (restaurant) {
-      const addMenu = await this.restaurantRepository.addMenu(
-        _id,
-        createMenusDto,
-      );
-      return addMenu;
+      return await this.restaurantRepository.addMenu(_id, createMenusDto);
     } else {
-      throw new NotFoundException('Not Found Restaurant3');
+      throw new NotFoundException(`Not Found Restaurant by id${_id}`);
     }
   }
 

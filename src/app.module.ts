@@ -5,10 +5,7 @@ import { RestaurantsModule } from './restaurants/restaurants.module';
 import { MongooseModule } from '@nestjs/mongoose';
 
 @Module({
-  imports: [
-    RestaurantsModule,
-    MongooseModule.forRoot('mongodb://localhost/nest', {dbName: "dbname"}),
-  ],
+  imports: [RestaurantsModule, MongooseModule.forRoot('mongodb://localhost/nest', { dbName: 'dbname' })],
   controllers: [AppController],
   providers: [AppService],
 })

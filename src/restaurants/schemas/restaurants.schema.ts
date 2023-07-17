@@ -29,7 +29,7 @@ export class menuoption {
 
 @Schema()
 export class Menu {
-  @Prop()
+  @Prop({ required: true })
   name: string;
 
   @Prop()
@@ -40,6 +40,9 @@ export class Menu {
 
   @Prop()
   content: string;
+
+  @Prop({ required: true })
+  price: number;
 
   @Prop({ type: Date, default: Date.now })
   created_at: Date;
@@ -53,6 +56,7 @@ export class Menu {
   @Prop()
   options: menuoption;
 }
+export const MenusSchema = SchemaFactory.createForClass(Menu);
 
 @Schema()
 export class Restaurant {
