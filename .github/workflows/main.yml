@@ -72,5 +72,5 @@ jobs:
           IMAGE_TAG: ${{ github.sha }}
         run: |
           ( docker stop ${{ env.DOCKER_CONTAINER }} || true ) && ( docker rm ${{ env.DOCKER_CONTAINER }} || true )
-          docker run --name ${{ env.DOCKER_CONTAINER }} -d -p 80:3000 --restart always -v ./logs:/home/ubuntu/logs --env-file /home/ubuntu/envs/.env ${{ env.REGISTRY }}/${{ env.REPOSITORY }}:${{ env.IMAGE_TAG }}
+          docker run --name ${{ env.DOCKER_CONTAINER }} -d -p 80:3000 --restart always -v /home/ubuntu/logs:./logs --env-file /home/ubuntu/envs/.env ${{ env.REGISTRY }}/${{ env.REPOSITORY }}:${{ env.IMAGE_TAG }}
           docker image prune -af
