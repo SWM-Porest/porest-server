@@ -1,6 +1,6 @@
 import { Injectable, NotFoundException } from '@nestjs/common';
 import { CreateMenusDto, CreateRestaurantsDto } from './dto/create-restaurants.dto';
-import { UpdateMenusDto, UpdateRestaurantsDto } from './dto/update-restaurants.dto';
+import { UpdateRestaurantsDto } from './dto/update-restaurants.dto';
 import { Types } from 'mongoose';
 import { RestaurantRepository } from './restaurants.repository';
 
