@@ -6,6 +6,7 @@ import { MongooseModule } from '@nestjs/mongoose';
 import { ConfigModule } from '@nestjs/config';
 import * as Joi from 'joi';
 import { LoggerMiddleware } from './logger/logger.middleware';
+import { AuthModule } from './auth/auth.module';
 
 @Module({
   imports: [
@@ -20,6 +21,7 @@ import { LoggerMiddleware } from './logger/logger.middleware';
     }),
     RestaurantsModule,
     MongooseModule.forRoot(`mongodb://${process.env.DB_HOST}:${process.env.DB_PORT}/nest`, { dbName: 'dbname' }),
+    AuthModule,
   ],
   controllers: [AppController],
   providers: [AppService],
