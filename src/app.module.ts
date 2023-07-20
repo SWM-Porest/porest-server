@@ -20,7 +20,7 @@ import { AuthModule } from './auth/auth.module';
       cache: true,
     }),
     RestaurantsModule,
-    MongooseModule.forRoot(`mongodb://${process.env.DB_HOST}:${process.env.DB_PORT}/nest`, { dbName: 'dbname' }),
+    MongooseModule.forRoot(process.env.MONGO_URI),
     AuthModule,
   ],
   controllers: [AppController],
