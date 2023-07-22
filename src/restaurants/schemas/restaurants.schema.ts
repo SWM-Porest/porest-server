@@ -12,6 +12,9 @@ export class menuoption {
   en_name: string;
 
   @Prop()
+  en_content: string;
+
+  @Prop()
   content: string;
 
   @Prop()
@@ -39,7 +42,13 @@ export class Menu {
   category: string;
 
   @Prop()
-  content: string;
+  menutype: string;
+
+  @Prop()
+  description: string;
+
+  @Prop()
+  img: string[];
 
   @Prop({ required: true })
   price: number;
@@ -54,7 +63,7 @@ export class Menu {
   status: number;
 
   @Prop()
-  options: menuoption;
+  options: menuoption[];
 }
 export const MenusSchema = SchemaFactory.createForClass(Menu);
 
@@ -65,6 +74,18 @@ export class Restaurant {
 
   @Prop()
   en_name: string;
+
+  @Prop()
+  categroy: string[];
+
+  @Prop()
+  img: string[];
+
+  @Prop()
+  intro: string;
+
+  @Prop()
+  notice: string;
 
   @Prop()
   phone_number: string;
