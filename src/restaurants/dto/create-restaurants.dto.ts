@@ -8,6 +8,14 @@ export class CreateRestaurantsDto {
 
   en_name: string;
 
+  categroy: string[];
+
+  img: string[];
+
+  intro: string;
+
+  notice: string;
+
   phone_number: string;
 
   address: string;
@@ -27,9 +35,14 @@ export class CreateMenusDto {
 
   en_name: string;
 
-  content: string;
+  category: string;
 
-  @IsNotEmpty()
+  menutype: string;
+
+  description: string;
+
+  img: string[];
+
   price: number;
 
   created_at: Date;
@@ -38,7 +51,7 @@ export class CreateMenusDto {
 
   status: number;
 
-  options: menuoption;
+  options: menuoption[];
 }
 
 export class CreateMenuOptionsDto {
