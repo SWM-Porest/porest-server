@@ -15,12 +15,12 @@ export class RestaurantsController {
   }
 
   @Get()
-  async findAll() {
+  async findAll(): Promise<Restaurant[]> {
     return this.restaurantService.findAll();
   }
 
   @Get(':id')
-  async ViewRestaurant(@Param('id') id: string) {
+  async findOneRestaurant(@Param('id') id: string): Promise<Restaurant> {
     return await this.restaurantService.findOne(id);
   }
 
@@ -31,7 +31,7 @@ export class RestaurantsController {
   }
 
   @UseGuards(AuthGuard('basic'))
-  @Post('/menu/:id')
+  @Post(':id/menus/')
   async addMenu(@Param('id') id: string, @Body() createMenusDto: CreateMenusDto) {
     return await this.restaurantService.addMenu(id, createMenusDto);
   }

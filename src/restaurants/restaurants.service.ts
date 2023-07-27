@@ -3,6 +3,7 @@ import { CreateMenusDto, CreateRestaurantsDto } from './dto/create-restaurants.d
 import { UpdateRestaurantsDto } from './dto/update-restaurants.dto';
 import { Types } from 'mongoose';
 import { RestaurantRepository } from './restaurants.repository';
+import { Restaurant } from './schemas/restaurants.schema';
 
 @Injectable()
 export class RestaurantsService {
@@ -12,13 +13,13 @@ export class RestaurantsService {
     return this.restaurantRepository.createRestaurant(createRestaurantsDto);
   }
 
-  findAll() {
-    return 'Find All Restaurants';
+  async findAll(): Promise<Restaurant[]> {
+    return this.restaurantRepository.findAll();
   }
 
-  async findOne(_id: string) {
+  async findOne(_id: string): Promise<Restaurant> {
     if (Types.ObjectId.isValid(_id)) {
-      const findRestaurant = await this.restaurantRepository.findOneRestaurant(_id);
+      const findRestaurant: Restaurant = await this.restaurantRepository.findOneRestaurant(_id);
       if (findRestaurant) {
         return findRestaurant;
       } else {
@@ -29,12 +30,12 @@ export class RestaurantsService {
     }
   }
 
-  update(_id: string, updateRestaurantsDto: UpdateRestaurantsDto) {
-    return `Update Restaurant with id${_id}`;
+  async update(_id: string, updateRestaurantsDto: UpdateRestaurantsDto) {
+    return this.restaurantRepository.updateRestaurant(_id, updateRestaurantsDto);
   }
 
-  async addMenu(_id: string, createMenusDto: CreateMenusDto) {
-    const restaurant = await this.findOne(_id);
+  async addMenu(_id: string, createMenusDto: CreateMenusDto): Promise<Restaurant> {
+    const restaurant: Restaurant = await this.findOne(_id);
     if (restaurant) {
       return await this.restaurantRepository.addMenu(_id, createMenusDto);
     } else {

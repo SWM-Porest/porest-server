@@ -1,6 +1,6 @@
 import { IsNotEmpty } from 'class-validator';
 import { Date } from 'mongoose';
-import { Menu, menuoption } from '../schemas/restaurants.schema';
+import { menuoption } from '../schemas/restaurants.schema';
 
 export class CreateRestaurantsDto {
   @IsNotEmpty()
@@ -25,8 +25,6 @@ export class CreateRestaurantsDto {
   updated_at: Date;
 
   status: number;
-
-  menus: Menu[];
 }
 
 export class CreateMenusDto {
