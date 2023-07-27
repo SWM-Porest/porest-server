@@ -31,7 +31,7 @@ export class RestaurantsController {
   }
 
   @UseGuards(AuthGuard('basic'))
-  @Post('/menu/:id')
+  @Post(':id/menu/')
   async addMenu(@Param('id') id: string, @Body() createMenusDto: CreateMenusDto) {
     return await this.restaurantService.addMenu(id, createMenusDto);
   }
