@@ -3,6 +3,7 @@ import { RestaurantsService } from './restaurants.service';
 import { CreateMenusDto, CreateRestaurantsDto } from './dto/create-restaurants.dto';
 import { UpdateRestaurantsDto } from './dto/update-restaurants.dto';
 import { AuthGuard } from '@nestjs/passport';
+import { Restaurant } from './schemas/restaurants.schema';
 
 @Controller('restaurants')
 export class RestaurantsController {
