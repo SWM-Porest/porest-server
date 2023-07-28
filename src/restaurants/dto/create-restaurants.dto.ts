@@ -10,13 +10,13 @@ export class CreateRestaurantsDto {
 
   categroy: string[];
 
-  img: string[];
-
   intro: string;
 
   notice: string;
 
   phone_number: string;
+
+  banner_image_urls: string[];
 
   address: string;
 
@@ -39,7 +39,7 @@ export class CreateMenusDto {
 
   description: string;
 
-  img: string[];
+  img: string;
 
   price: number;
 
