@@ -2,15 +2,15 @@ import { HttpException, HttpStatus, Injectable, NotFoundException } from '@nestj
 import { CreateMenusDto, CreateRestaurantsDto } from './dto/create-restaurants.dto';
 import { UpdateRestaurantsDto } from './dto/update-restaurants.dto';
 import { Types } from 'mongoose';
-import { RestaurantRepository } from './restaurants.repository';
+import { RestaurantsRepository } from './restaurants.repository';
 import { Restaurant } from './schemas/restaurants.schema';
-import { ImageUploadService } from 'src/common/uploader/image-upload.service';
-import { UPLOAD_TYPE } from 'src/common/uploader/upload-type';
+import { ImageUploadService } from '../common/uploader/image-upload.service';
+import { UPLOAD_TYPE } from '../common/uploader/upload-type';
 
 @Injectable()
 export class RestaurantsService {
   constructor(
-    private readonly restaurantRepository: RestaurantRepository,
+    private readonly restaurantRepository: RestaurantsRepository,
     private readonly imageUploadService: ImageUploadService,
   ) {}
 
