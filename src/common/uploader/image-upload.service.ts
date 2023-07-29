@@ -6,9 +6,13 @@ import { UploadType } from 'aws-sdk/clients/devicefarm';
 @Injectable()
 export class ImageUploadService {
   uploadImage(files: Express.Multer.File[], upload_type: UploadType): Promise<string[]> {
-    return process.env.NODE_ENV === 'release'
-      ? this.uploadImageAWSS3(files, upload_type)
-      : this.uploadImagelocal(files, upload_type);
+    if (!files || files.length === 0) {
+      return Promise.resolve([]);
+    } else {
+      return process.env.NODE_ENV === 'release'
+        ? this.uploadImageAWSS3(files, upload_type)
+        : this.uploadImagelocal(files, upload_type);
+    }
   }
 
   private convertFileName(file: Express.Multer.File): string {
