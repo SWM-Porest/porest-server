@@ -10,7 +10,11 @@ async function bootstrap() {
   }
 
   const app = await NestFactory.create(AppModule);
-  app.enableCors();
+
+  if (process.env.NODE_ENV === 'dev') {
+    app.enableCors();
+  }
+
   await app.listen(process.env.PORT, () => {
     if (process.send) {
       process.send('ready');
