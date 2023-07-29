@@ -1,7 +1,7 @@
-import * as AWS from 'aws-sdk';
-import * as fs from 'fs';
 import { HttpException, HttpStatus, Injectable } from '@nestjs/common';
+import * as AWS from 'aws-sdk';
 import { UploadType } from 'aws-sdk/clients/devicefarm';
+import * as fs from 'fs';
 
 @Injectable()
 export class ImageUploadService {
@@ -26,7 +26,7 @@ export class ImageUploadService {
 
       try {
         if (!fs.existsSync(path)) {
-          fs.mkdirSync(path);
+          fs.mkdirSync(path, { recursive: true });
         }
         fs.writeFileSync(path + savedFilename, file.buffer);
       } catch (error) {
