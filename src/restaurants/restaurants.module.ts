@@ -4,6 +4,7 @@ import { RestaurantsService } from './restaurants.service';
 import { MongooseModule } from '@nestjs/mongoose';
 import { Menu, MenusSchema, Restaurant, RestaurantsSchema } from './schemas/restaurants.schema';
 import { RestaurantRepository } from './restaurants.repository';
+import { ImageUploadService } from 'src/common/uploader/image-upload.service';
 
 @Module({
   imports: [
@@ -13,6 +14,6 @@ import { RestaurantRepository } from './restaurants.repository';
     ]),
   ],
   controllers: [RestaurantsController],
-  providers: [RestaurantsService, RestaurantRepository],
+  providers: [RestaurantsService, RestaurantRepository, ImageUploadService],
 })
 export class RestaurantsModule {}

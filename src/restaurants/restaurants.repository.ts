@@ -13,14 +13,12 @@ export class RestaurantRepository {
   ) {}
 
   async createRestaurant(createRestaurantsDto: CreateRestaurantsDto): Promise<Restaurant> {
-    const { name } = createRestaurantsDto;
-
-    if (await this.restaurantModel.exists({ name })) {
-      throw new HttpException('Name is Duplicated', HttpStatus.CONFLICT);
-    }
     return await this.restaurantModel.create(createRestaurantsDto);
   }
 
+  async isExistRestaurant(name: string): Promise<boolean> {
+    return (await this.restaurantModel.exists({ name })) ? true : false;
+  }
   async updateRestaurant(_id: string, updateRestaurantsDto: UpdateRestaurantsDto): Promise<Restaurant> {
     return await this.restaurantModel.findByIdAndUpdate(_id, updateRestaurantsDto, { new: true });
   }
