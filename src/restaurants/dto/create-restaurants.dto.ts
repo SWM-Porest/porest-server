@@ -1,6 +1,6 @@
 import { IsNotEmpty } from 'class-validator';
 import { Date } from 'mongoose';
-import { Menu, menuoption } from '../schemas/restaurants.schema';
+import { menuoption } from '../schemas/restaurants.schema';
 
 export class CreateRestaurantsDto {
   @IsNotEmpty()
@@ -10,13 +10,13 @@ export class CreateRestaurantsDto {
 
   categroy: string[];
 
-  img: string[];
-
   intro: string;
 
   notice: string;
 
   phone_number: string;
+
+  banner_image_urls: string[];
 
   address: string;
 
@@ -25,8 +25,6 @@ export class CreateRestaurantsDto {
   updated_at: Date;
 
   status: number;
-
-  menus: Menu[];
 }
 
 export class CreateMenusDto {
@@ -41,7 +39,7 @@ export class CreateMenusDto {
 
   description: string;
 
-  img: string[];
+  img: string;
 
   price: number;
 

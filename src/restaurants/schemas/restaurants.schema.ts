@@ -48,7 +48,7 @@ export class Menu {
   description: string;
 
   @Prop()
-  img: string[];
+  img: string;
 
   @Prop({ required: true })
   price: number;
@@ -79,9 +79,6 @@ export class Restaurant {
   categroy: string[];
 
   @Prop()
-  img: string[];
-
-  @Prop()
   intro: string;
 
   @Prop()
@@ -89,6 +86,9 @@ export class Restaurant {
 
   @Prop()
   phone_number: string;
+
+  @Prop()
+  banner_image_urls: string[];
 
   @Prop()
   address: string;
