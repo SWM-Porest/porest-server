@@ -12,9 +12,10 @@ async function bootstrap() {
 
   const app = await NestFactory.create(AppModule);
 
-  if (process.env.NODE_ENV === 'dev') {
-    app.enableCors();
-  }
+  app.enableCors(
+    origin : ['http://localhost:3001', 'http://pocketrestaurant.net'],
+    credentials : true,
+  );
 
   const config = new DocumentBuilder()
     .setTitle('PocketRestaurant API')
