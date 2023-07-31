@@ -9,7 +9,7 @@ export class ImageUploadService {
     if (!files || files.length === 0) {
       return Promise.resolve([]);
     } else {
-      return process.env.NODE_ENV === 'release'
+      return process.env.NODE_ENV === 'prod'
         ? this.uploadImageAWSS3(files, upload_type)
         : this.uploadImagelocal(files, upload_type);
     }
