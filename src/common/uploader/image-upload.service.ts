@@ -1,5 +1,6 @@
 import { HttpException, HttpStatus, Injectable } from '@nestjs/common';
-import * as AWS from 'aws-sdk';
+
+import { PutObjectCommand, S3Client } from '@aws-sdk/client-s3';
 import { UploadType } from 'aws-sdk/clients/devicefarm';
 import * as fs from 'fs';
 
@@ -11,7 +12,7 @@ export class ImageUploadService {
     } else {
       return process.env.NODE_ENV === 'prod'
         ? this.uploadImageAWSS3(files, upload_type)
-        : this.uploadImagelocal(files, upload_type);
+        : this.uploadImageAWSS3(files, upload_type);
     }
   }
 
@@ -38,26 +39,26 @@ export class ImageUploadService {
   }
 
   private async uploadImageAWSS3(files: Express.Multer.File[], upload_type: UploadType): Promise<string[]> {
+    const s3Client = new S3Client({
+      region: process.env.AWS_REGION,
+      credentials: {
+        accessKeyId: process.env.AWS_ACCESS_KEY_ID,
+        secretAccessKey: process.env.AWS_SECRET_KEY,
+      },
+    });
+
     return Promise.all(
       files.map(async (file) => {
-        AWS.config.update({
-          credentials: {
-            accessKeyId: process.env.AWS_ACCESS_KEY_ID,
-            secretAccessKey: process.env.AWS_SECRET_KEY,
-          },
-        });
-
         const savedFilename = this.convertFileName(file);
-        const s3 = new AWS.S3();
 
         try {
-          await s3
-            .putObject({
-              Key: savedFilename,
+          await s3Client.send(
+            new PutObjectCommand({
+              Key: 'images' + upload_type + savedFilename,
               Body: file.buffer,
-              Bucket: process.env.AWS_S3_BUCKET_NAME + '/images' + upload_type,
-            })
-            .promise();
+              Bucket: process.env.AWS_S3_BUCKET_NAME,
+            }),
+          );
         } catch (error) {
           console.error(error);
           throw new HttpException('Failed to upload the image to AWS S3.', HttpStatus.INTERNAL_SERVER_ERROR);
