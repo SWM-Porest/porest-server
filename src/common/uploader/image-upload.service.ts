@@ -1,5 +1,6 @@
 import { HttpException, HttpStatus, Injectable } from '@nestjs/common';
 import * as AWS from 'aws-sdk';
+import { S3 } from '@aws-sdk/client-s3';
 import { UploadType } from 'aws-sdk/clients/devicefarm';
 import * as fs from 'fs';
 
@@ -48,16 +49,14 @@ export class ImageUploadService {
         });
 
         const savedFilename = this.convertFileName(file);
-        const s3 = new AWS.S3();
+        const s3 = new S3();
 
         try {
-          await s3
-            .putObject({
-              Key: savedFilename,
-              Body: file.buffer,
-              Bucket: process.env.AWS_S3_BUCKET_NAME + '/images' + upload_type,
-            })
-            .promise();
+          await s3.putObject({
+            Key: savedFilename,
+            Body: file.buffer,
+            Bucket: process.env.AWS_S3_BUCKET_NAME + '/images' + upload_type,
+          });
         } catch (error) {
           console.error(error);
           throw new HttpException('Failed to upload the image to AWS S3.', HttpStatus.INTERNAL_SERVER_ERROR);
