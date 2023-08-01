@@ -12,7 +12,7 @@ export class ImageUploadService {
     } else {
       return process.env.NODE_ENV === 'prod'
         ? this.uploadImageAWSS3(files, upload_type)
-        : this.uploadImageAWSS3(files, upload_type);
+        : this.uploadImagelocal(files, upload_type);
     }
   }
 
