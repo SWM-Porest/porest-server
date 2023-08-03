@@ -47,7 +47,7 @@ jobs:
         env:
           REGISTRY: ${{ steps.login-ecr.outputs.registry }}
           REPOSITORY: porest/nestjs
-          IMAGE_TAG: ${{ github.sha }}
+          IMAGE_TAG: latest
         run: |
           docker build -t ${{ env.REGISTRY }}/${{ env.REPOSITORY }}:${{ env.IMAGE_TAG }} .
           docker push ${{ env.REGISTRY }}/${{ env.REPOSITORY }}:${{ env.IMAGE_TAG }}
@@ -69,7 +69,7 @@ jobs:
         env:
           REGISTRY: ${{ steps.login-ecr.outputs.registry }}
           REPOSITORY: porest/nestjs
-          IMAGE_TAG: ${{ github.sha }}
+          IMAGE_TAG: latest
         run: |
           ( docker stop ${{ env.DOCKER_CONTAINER }} || true ) && ( docker rm ${{ env.DOCKER_CONTAINER }} || true )
           docker run --name ${{ env.DOCKER_CONTAINER }} -d -p 80:3000 --restart always -v /home/ubuntu/logs:/app/logs --env-file /home/ubuntu/envs/.env ${{ env.REGISTRY }}/${{ env.REPOSITORY }}:${{ env.IMAGE_TAG }}
