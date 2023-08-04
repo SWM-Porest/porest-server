@@ -2,9 +2,14 @@ import { Prop, Schema, SchemaFactory } from '@nestjs/mongoose';
 import { Date, HydratedDocument } from 'mongoose';
 
 export type RestaurantsDocument = HydratedDocument<Restaurant>;
-
 @Schema()
-export class menuoption {
+export class Image {
+  filename: string;
+  path: string;
+  type: string;
+}
+@Schema()
+export class Menuoption {
   @Prop()
   name: string;
 
@@ -47,8 +52,8 @@ export class Menu {
   @Prop()
   description: string;
 
-  @Prop()
-  img: string;
+  @Prop({ type: Object })
+  img: Image;
 
   @Prop({ required: true })
   price: number;
@@ -63,7 +68,7 @@ export class Menu {
   status: number;
 
   @Prop()
-  options: menuoption[];
+  options: Menuoption[];
 }
 export const MenusSchema = SchemaFactory.createForClass(Menu);
 
@@ -87,8 +92,8 @@ export class Restaurant {
   @Prop()
   phone_number: string;
 
-  @Prop()
-  banner_image_urls: string[];
+  @Prop({ type: [Object] })
+  banner_images: Image[];
 
   @Prop()
   address: string;
