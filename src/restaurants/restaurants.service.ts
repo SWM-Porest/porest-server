@@ -21,8 +21,8 @@ export class RestaurantsService {
       throw new HttpException('Name is Duplicated', HttpStatus.CONFLICT);
     }
 
-    const bannerImageUrls = await this.imageUploadService.uploadImage(files['image'], UPLOAD_TYPE.RESTAURANT_BANNER);
-    createRestaurantsDto.banner_image_urls = bannerImageUrls;
+    const bannerImages = await this.imageUploadService.uploadImage(files['image'], UPLOAD_TYPE.RESTAURANT_BANNER);
+    createRestaurantsDto.banner_images = bannerImages;
 
     return this.restaurantRepository.createRestaurant(createRestaurantsDto);
   }
@@ -45,10 +45,10 @@ export class RestaurantsService {
   }
 
   async update(_id: string, updateRestaurantsDto: UpdateRestaurantsDto, files: Express.Multer.File[]) {
-    const banner_image_urls = await this.imageUploadService.uploadImage(files['image'], UPLOAD_TYPE.RESTAURANT_BANNER);
+    const banner_images = await this.imageUploadService.uploadImage(files['image'], UPLOAD_TYPE.RESTAURANT_BANNER);
 
-    if (banner_image_urls.length > 0) {
-      updateRestaurantsDto.banner_image_urls = banner_image_urls;
+    if (banner_images.length > 0) {
+      updateRestaurantsDto.banner_images = banner_images;
     }
 
     return this.restaurantRepository.updateRestaurant(_id, updateRestaurantsDto);
@@ -61,8 +61,8 @@ export class RestaurantsService {
       throw new NotFoundException(`Not Found Restaurant by id${_id}`);
     }
 
-    const image_urls = await this.imageUploadService.uploadImage(files['image'], UPLOAD_TYPE.MENU);
-    createMenusDto.img = image_urls.length > 0 ? image_urls[0] : '';
+    const images = await this.imageUploadService.uploadImage(files['image'], UPLOAD_TYPE.MENU);
+    createMenusDto.img = images.length > 0 ? images[0] : null;
 
     return await this.restaurantRepository.addMenu(_id, createMenusDto);
   }
