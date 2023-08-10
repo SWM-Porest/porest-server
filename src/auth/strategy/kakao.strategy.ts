@@ -20,7 +20,7 @@ export class KakaoStrategy extends PassportStrategy(Strategy, 'kakao') {
     const user_nick = profile._json.properties.nickname;
     const user_profile: User = {
       id: profile.id,
-      email: user_email,
+      email: user_email ? user_email : '',
       nickname: user_nick,
     };
     try {
