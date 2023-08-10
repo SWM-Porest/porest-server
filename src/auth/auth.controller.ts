@@ -1,4 +1,4 @@
-import { Controller, UseGuards, Get, Post, Body, Res, Request, Req } from '@nestjs/common';
+import { Controller, UseGuards, Get, Post, Body, Res, Req } from '@nestjs/common';
 import { AuthService } from './auth.service';
 import { UsersService } from './user.service';
 import {
@@ -13,6 +13,7 @@ import { Response } from 'express';
 import { KakaoAuthGuard } from './guard/kakao-auth.guard';
 import { JwtAuthGuard } from './guard/jwt-auth.guard';
 import { JwtRefreshGuard } from './guard/jwt-refresh.guard';
+import { RegistUserDTO } from './dto/registUser.dto';
 
 @ApiTags('auth')
 @Controller('auth')
@@ -29,7 +30,6 @@ export class AuthController {
   @UseGuards(KakaoAuthGuard)
   @Get('kakao')
   async kakaoLogin() {
-    console.log('카카오: auth/kakao 라우터');
     return;
   }
 
@@ -41,7 +41,7 @@ export class AuthController {
   @Get('kakao/callback')
   async kakaocallback(@Req() req, @Res() res: Response) {
     if (req.user.type === 'login') {
-      res.cookie('access_token', req.user.access_token, { expires: new Date(Date.now() + 1000 * 10) });
+      res.cookie('access_token', req.user.access_token, { expires: new Date(Date.now() + 1000 * 60 * 60 * 24) });
       res.cookie('refresh_token', req.user.refresh_token, { expires: new Date(Date.now() + 1000 * 60 * 60 * 24 * 7) });
     }
     res.redirect(process.env.LOGIN_REDIRECT_URL);
@@ -67,10 +67,10 @@ export class AuthController {
   })
   @UseGuards(JwtAuthGuard)
   @Post('login')
-  async registUser(@Request() req: any, @Body() @Res() res: Response) {
+  async registUser(@Req() req: any, @Body() RegistUserDTO: RegistUserDTO, @Res() res: Response) {
     try {
       console.log('req.user:', req.user);
-      res.json({ success: true, message: 'user login successful' });
+      res.json({ success: true, message: 'login success' });
     } catch (error) {
       console.log(error);
     }
