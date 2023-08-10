@@ -41,7 +41,7 @@ export class JwtAuthGuard extends AuthGuard('jwt') {
 
       const time_remaining = Math.floor((tokenExp.getTime() - current_time.getTime()) / 1000 / 60);
 
-      if (token_verify.user_token === 'loginToken') {
+      if (token_verify.user_token === 'accessToken') {
         if (time_remaining < 5) {
           // 로그인 토큰의남은 시간이 5분 미만일때
           // 엑세스 토큰 정보로 유저를 찾는다.
