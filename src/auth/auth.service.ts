@@ -23,32 +23,27 @@ export class AuthService {
 
   async createLoginToken(user: User) {
     const payload = {
-      user_id: user.email,
-      user_token: 'loginToken',
+      user_id: user.id,
+      user_nick: user?.nickname,
+      user_access_token: 'accessToken',
     };
 
     return this.jwtService.sign(payload, {
       secret: process.env.JWT_SECRET,
-      expiresIn: '6m',
+      expiresIn: '10m',
     });
   }
 
-  async createRefreshToken(user: User) {
+  async createRefreshToken(user: User): Promise<string> {
     const payload = {
-      user_id: user.email,
+      user_id: user.id,
       user_token: 'refreshToken',
     };
 
-    const token = this.jwtService.sign(payload, {
+    return this.jwtService.sign(payload, {
       secret: process.env.JWT_SECRET,
-      expiresIn: '50m',
+      expiresIn: '60m',
     });
-
-    const refresh_token = token;
-
-    await this.authRepository.updateToken(token, user.email);
-
-    return refresh_token;
   }
 
   onceToken(user_profile: any) {

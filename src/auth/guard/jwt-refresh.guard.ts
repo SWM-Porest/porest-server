@@ -1,7 +1,6 @@
 import { ExecutionContext, HttpException, HttpStatus, Injectable } from '@nestjs/common';
 import { JwtService } from '@nestjs/jwt';
 import { AuthGuard } from '@nestjs/passport';
-import CryptoJS from 'crypto-js';
 import { UsersService } from '../user.service';
 import { AuthService } from '../auth.service';
 
@@ -31,18 +30,11 @@ export class JwtRefreshGuard extends AuthGuard('jwt') {
 
   async validate(refreshToken: string) {
     try {
-      const bytes = CryptoJS.AES.decrypt(refreshToken, process.env.AES_KEY);
-      const token = JSON.parse(bytes.toString(CryptoJS.enc.Utf8));
+      const token_verify = await this.authService.tokenValidate(refreshToken);
 
-      const token_verify = await this.authService.tokenValidate(token);
-
-      const user = await this.userService.findUserById(token_verify.user_no);
-
-      if (user.kakao_access_token === token) {
-        return await this.authService.createLoginToken(user);
-      } else {
-        throw new Error('no permission');
-      }
+      const user = await this.userService.findUserById(token_verify.user_id);
+      console.log('i am here: ', user);
+      return await this.authService.createLoginToken(user);
     } catch (error) {
       switch (error.message) {
         // 토큰에 대한 오류를 판단합니다.

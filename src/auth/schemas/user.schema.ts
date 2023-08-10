@@ -10,12 +10,6 @@ export class User {
 
   @Prop()
   nickname: string;
-
-  @Prop()
-  kakao_access_token: string;
-
-  @Prop()
-  kakao_refresh_token: string;
 }
 
 export const UserSchema = SchemaFactory.createForClass(User);

@@ -15,8 +15,8 @@ export class UsersService {
     return this.userModel.findOne({ email }).exec();
   }
 
-  async findUserById(user_id: number) {
-    return await this.userModel.findOne({ id: user_id }).exec();
+  async findUserById(id: number) {
+    return await this.userModel.findOne({ id }).exec();
   }
 
   async create(user: User): Promise<User> {

@@ -1,4 +1,4 @@
-import { Controller, UseGuards, Get, Post, Body, Res, Request } from '@nestjs/common';
+import { Controller, UseGuards, Get, Post, Body, Res, Request, Req } from '@nestjs/common';
 import { AuthService } from './auth.service';
 import { UsersService } from './user.service';
 import {
@@ -13,7 +13,6 @@ import { Response } from 'express';
 import { KakaoAuthGuard } from './guard/kakao-auth.guard';
 import { JwtAuthGuard } from './guard/jwt-auth.guard';
 import { JwtRefreshGuard } from './guard/jwt-refresh.guard';
-import { RegistUserDTO } from './dto/registUser.dto';
 
 @ApiTags('auth')
 @Controller('auth')
@@ -30,6 +29,7 @@ export class AuthController {
   @UseGuards(KakaoAuthGuard)
   @Get('kakao')
   async kakaoLogin() {
+    console.log('카카오: auth/kakao 라우터');
     return;
   }
 
@@ -41,12 +41,10 @@ export class AuthController {
   @Get('kakao/callback')
   async kakaocallback(@Req() req, @Res() res: Response) {
     if (req.user.type === 'login') {
-      res.cookie('access_token', req.user.access_token);
-      res.cookie('refresh_token', req.user.refresh_token);
-    } else {
-      res.cookie('once_token', req.user.once_token);
+      res.cookie('access_token', req.user.access_token, { expires: new Date(Date.now() + 1000 * 10) });
+      res.cookie('refresh_token', req.user.refresh_token, { expires: new Date(Date.now() + 1000 * 60 * 60 * 24 * 7) });
     }
-    res.redirect('login');
+    res.redirect(process.env.LOGIN_REDIRECT_URL);
     res.end();
   }
 
@@ -69,28 +67,10 @@ export class AuthController {
   })
   @UseGuards(JwtAuthGuard)
   @Post('login')
-  async registUser(@Request() req: any, @Body() registUserDTO: RegistUserDTO, @Res() res: Response) {
+  async registUser(@Request() req: any, @Body() @Res() res: Response) {
     try {
       console.log('req.user:', req.user);
-      const { user_email, user_nick, user_token } = req.user;
-      const { email } = registUserDTO;
-      // 1회용 토큰인경우
-      if (user_token === 'onceToken') {
-        await this.usersService.create({
-          id: 2953046041,
-          email: email,
-          nickname: user_nick,
-          kakao_access_token: '',
-          kakao_refresh_token: '',
-        });
-        const user = await this.authService.validateUser(user_email);
-        const access_token = await this.authService.createLoginToken(user);
-        const refresh_token = await this.authService.createRefreshToken(user);
-
-        res.setHeader('access_token', access_token);
-        res.setHeader('refresh_token', refresh_token);
-        res.json({ success: true, message: 'user login successful' });
-      }
+      res.json({ success: true, message: 'user login successful' });
     } catch (error) {
       console.log(error);
     }
