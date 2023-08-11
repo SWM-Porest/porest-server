@@ -3,7 +3,7 @@ import { InjectModel } from '@nestjs/mongoose';
 import { Menu, Restaurant } from './schemas/restaurants.schema';
 import { Model } from 'mongoose';
 import { CreateMenusDto, CreateRestaurantsDto } from './dto/create-restaurants.dto';
-import { UpdateRestaurantsDto } from './dto/update-restaurants.dto';
+import { UpdateMenusDto, UpdateRestaurantsDto } from './dto/update-restaurants.dto';
 
 @Injectable()
 export class RestaurantRepository {
@@ -13,6 +13,13 @@ export class RestaurantRepository {
   ) {}
 
   async createRestaurant(createRestaurantsDto: CreateRestaurantsDto): Promise<Restaurant> {
+    createRestaurantsDto.menus = createRestaurantsDto.menus.map((menu) => {
+      if (!menu._id) {
+        return new this.menuModel(menu);
+      } else {
+        return menu;
+      }
+    });
     return await this.restaurantModel.create(createRestaurantsDto);
   }
 
@@ -20,6 +27,16 @@ export class RestaurantRepository {
     return (await this.restaurantModel.exists({ name })) ? true : false;
   }
   async updateRestaurant(_id: string, updateRestaurantsDto: UpdateRestaurantsDto): Promise<Restaurant> {
+    updateRestaurantsDto.menus = await Promise.all(
+      updateRestaurantsDto.menus.map((menu) => {
+        if (!menu._id) {
+          return new this.menuModel(menu);
+        } else {
+          return menu;
+        }
+      }),
+    );
+
     return await this.restaurantModel.findByIdAndUpdate(_id, updateRestaurantsDto, { new: true });
   }
 
@@ -32,7 +49,14 @@ export class RestaurantRepository {
   }
 
   async addMenu(_id: string, createMenusDto: CreateMenusDto): Promise<Restaurant> {
-    const menus: CreateMenusDto = await this.menuModel.create(createMenusDto);
-    return await this.restaurantModel.findByIdAndUpdate(_id, { $push: { menus } }, { new: true });
+    const menu: CreateMenusDto = new this.menuModel(createMenusDto);
+    return await this.restaurantModel.findByIdAndUpdate(_id, { $push: { menu } }, { new: true });
+  }
+  async updateMenu(_id: string, updateMenusDto: UpdateMenusDto): Promise<Restaurant> {
+    return await this.restaurantModel.findOneAndUpdate(
+      { _id, 'menus._id': updateMenusDto._id },
+      { $set: { 'menus.$': updateMenusDto } },
+      { new: true },
+    );
   }
 }
