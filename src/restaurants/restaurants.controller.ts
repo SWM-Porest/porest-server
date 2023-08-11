@@ -12,7 +12,7 @@ import {
 } from '@nestjs/common';
 import { RestaurantsService } from './restaurants.service';
 import { CreateMenusDto, CreateRestaurantsDto } from './dto/create-restaurants.dto';
-import { UpdateRestaurantsDto } from './dto/update-restaurants.dto';
+import { UpdateMenusDto, UpdateRestaurantsDto } from './dto/update-restaurants.dto';
 import { AuthGuard } from '@nestjs/passport';
 import { FileFieldsInterceptor } from '@nestjs/platform-express';
 import { Restaurant } from './schemas/restaurants.schema';
@@ -41,12 +41,17 @@ export class RestaurantsController {
   }
 
   @UseGuards(AuthGuard('basic'))
-  @UseInterceptors(FileFieldsInterceptor([{ name: 'image', maxCount: 10 }]))
+  @UseInterceptors(
+    FileFieldsInterceptor([
+      { name: 'image', maxCount: 10 },
+      { name: 'menuImage', maxCount: 100 },
+    ]),
+  )
   @Patch(':id')
   async updateRestaurant(
     @Param('id') id: string,
     @Body() data: any,
-    @UploadedFiles() files: Express.Multer.File[],
+    @UploadedFiles() files: { image?: Express.Multer.File[]; menuImage?: Express.Multer.File[] },
   ): Promise<Restaurant> {
     const updateRestaurantsDto: UpdateRestaurantsDto = JSON.parse(data.updateRestaurantsDto);
 
@@ -55,10 +60,18 @@ export class RestaurantsController {
 
   @UseGuards(AuthGuard('basic'))
   @UseInterceptors(FileFieldsInterceptor([{ name: 'image', maxCount: 1 }]))
-  @Post(':id/menus/')
+  @Post(':id/menus')
   async addMenu(@Param('id') id: string, @Body() data: any, @UploadedFiles() files: Express.Multer.File[]) {
     const createMenusDto: CreateMenusDto = JSON.parse(data.createMenusDto);
     return await this.restaurantService.addMenu(id, createMenusDto, files);
+  }
+
+  @UseGuards(AuthGuard('basic'))
+  @UseInterceptors(FileFieldsInterceptor([{ name: 'image', maxCount: 1 }]))
+  @Patch(':id/menus')
+  async updateMenu(@Param('id') id: string, @Body() data: any, @UploadedFiles() files: Express.Multer.File[]) {
+    const updateMenusDto: UpdateMenusDto = JSON.parse(data.updateMenusDto);
+    return await this.restaurantService.updateMenu(id, updateMenusDto, files);
   }
 
   @UseGuards(AuthGuard('basic'))
