@@ -16,7 +16,12 @@ async function bootstrap() {
   const app = await NestFactory.create<NestExpressApplication>(AppModule);
 
   app.enableCors({
-    origin: ['http://localhost:3000', 'http://pocketrestaurant.net', 'https://pocketrestaurant.net'],
+    origin: [
+      'http://localhost:3000',
+      'http://pocketrestaurant.net',
+      'https://pocketrestaurant.net',
+      'http://192.168.110.215:3000',
+    ],
     credentials: true,
   });
 

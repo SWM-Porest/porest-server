@@ -69,6 +69,10 @@ export class Menu {
 
   @Prop()
   options: Menuoption[];
+
+  get _id(): string {
+    return this._id;
+  }
 }
 export const MenusSchema = SchemaFactory.createForClass(Menu);
 
@@ -81,7 +85,7 @@ export class Restaurant {
   en_name: string;
 
   @Prop()
-  categroy: string[];
+  category: string[];
 
   @Prop()
   intro: string;
