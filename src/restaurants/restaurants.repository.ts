@@ -32,7 +32,7 @@ export class RestaurantRepository {
   }
 
   async addMenu(_id: string, createMenusDto: CreateMenusDto): Promise<Restaurant> {
-    const menus: CreateMenusDto = await this.menuModel.create(createMenusDto);
+    const menus: CreateMenusDto = new this.menuModel(createMenusDto);
     return await this.restaurantModel.findByIdAndUpdate(_id, { $push: { menus } }, { new: true });
   }
 }
