@@ -66,7 +66,7 @@ export class JwtAuthGuard extends AuthGuard('jwt') {
     } catch (error) {
       switch (error.message) {
         // 토큰에 대한 오류를 판단합니다.
-        case 'invalid token':
+        case 'invalid signature':
           throw new HttpException('유효하지 않은 토큰입니다.', 401);
 
         case 'jwt expired':
