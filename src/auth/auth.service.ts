@@ -14,7 +14,9 @@ export class AuthService {
   ) {}
 
   async validateUser(user_id: number): Promise<any> {
+    console.log(user_id);
     const user = await this.usersService.findUserById(user_id);
+    console.log(user);
     if (!user) {
       return null;
     }
@@ -25,12 +27,13 @@ export class AuthService {
     const payload = {
       user_id: user.id,
       user_nick: user?.nickname,
-      user_access_token: 'accessToken',
+      user_level: user.userlevel,
+      user_token: 'accessToken',
     };
 
     return this.jwtService.sign(payload, {
       secret: process.env.JWT_SECRET,
-      expiresIn: '10m',
+      expiresIn: '1d',
     });
   }
 
@@ -42,7 +45,7 @@ export class AuthService {
 
     return this.jwtService.sign(payload, {
       secret: process.env.JWT_SECRET,
-      expiresIn: '60m',
+      expiresIn: '7d',
     });
   }
 

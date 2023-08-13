@@ -14,6 +14,9 @@ import { KakaoAuthGuard } from './guard/kakao-auth.guard';
 import { JwtAuthGuard } from './guard/jwt-auth.guard';
 import { JwtRefreshGuard } from './guard/jwt-refresh.guard';
 import { RegistUserDTO } from './dto/registUser.dto';
+import { Roles } from './decorator/roles.decorator';
+import { UserRole } from './schemas/user.schema';
+import { RolesGuard } from './guard/roles.guard';
 
 @ApiTags('auth')
 @Controller('auth')
@@ -69,7 +72,8 @@ export class AuthController {
     status: 401,
     description: '토큰 에러',
   })
-  @UseGuards(JwtAuthGuard)
+  @UseGuards(JwtAuthGuard, RolesGuard)
+  @Roles(UserRole.USER)
   @Post('login')
   async registUser(@Req() req: any, @Body() RegistUserDTO: RegistUserDTO, @Res() res: Response) {
     try {
@@ -87,5 +91,36 @@ export class AuthController {
   @Get('refresh-accesstoken')
   async refreshAccessToken() {
     return { success: true, message: 'new accessToken Issuance success' };
+  }
+
+  @ApiBearerAuth('access-token')
+  @ApiOperation({
+    summary: '회원정보 수정',
+    description: '회원정보를 수정하는 API입니다.',
+  })
+  @ApiResponse({
+    status: 201,
+    description: '정상 요청',
+  })
+  @ApiBadRequestResponse({
+    status: 400,
+    description: '잘못된 정보 요청',
+  })
+  @ApiUnauthorizedResponse({
+    status: 401,
+    description: '토큰 에러',
+  })
+  @Roles(UserRole.USER)
+  @UseGuards(JwtAuthGuard)
+  @UseGuards(RolesGuard)
+  @Post('update')
+  async updateUser(@Req() req: any, @Body() registUserDto: RegistUserDTO) {
+    try {
+      return await this.usersService.update(registUserDto);
+    } catch (error) {
+      console.log(error);
+    }
+    // 그 외의 경우
+    return false;
   }
 }

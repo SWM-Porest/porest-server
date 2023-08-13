@@ -22,6 +22,9 @@ export class JwtRefreshGuard extends AuthGuard('jwt') {
     const refreshToken = authorization.replace('Bearer ', '');
     const refreshTokenValidate = await this.validate(refreshToken);
 
+    response.cookie('access_token', refreshTokenValidate, {
+      expires: new Date(Date.now() + 1000 * 60 * 60 * 24),
+    });
     response.setHeader('access_token', refreshTokenValidate);
     response.setHeader('tokenReissue', true);
 

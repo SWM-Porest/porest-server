@@ -3,17 +3,30 @@ import { JwtService } from '@nestjs/jwt';
 import { AuthGuard } from '@nestjs/passport';
 import { UsersService } from '../user.service';
 import { AuthService } from '../auth.service';
+import { Reflector } from '@nestjs/core';
+import { ROLES_KEY } from '../decorator/roles.decorator';
 
 @Injectable()
 export class JwtAuthGuard extends AuthGuard('jwt') {
-  constructor(private authService: AuthService, private jwtService: JwtService, private userService: UsersService) {
+  constructor(private authService: AuthService, private userService: UsersService, private reflector: Reflector) {
     super();
   }
+
   async canActivate(context: ExecutionContext) {
     const request = context.switchToHttp().getRequest();
     const response = context.switchToHttp().getResponse();
 
     const { authorization } = request.headers;
+
+    const requiredRoles = this.reflector.getAllAndOverride<string[]>(ROLES_KEY, [
+      context.getHandler(),
+      context.getClass(),
+    ]);
+
+    if (!requiredRoles) {
+      return true; // 권한 검사가 필요하지 않은 경우 통과
+    }
+
     if (authorization === undefined) {
       throw new HttpException('Token 전송 안됨', HttpStatus.UNAUTHORIZED);
     }
@@ -27,7 +40,7 @@ export class JwtAuthGuard extends AuthGuard('jwt') {
       response.setHeader('tokenReissue', false);
     }
     request.user = tokenValidate.user ? tokenValidate.user : tokenValidate;
-    return true;
+    return request.user;
   }
 
   async validate(token: string) {

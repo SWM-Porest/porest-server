@@ -22,6 +22,7 @@ export class KakaoStrategy extends PassportStrategy(Strategy, 'kakao') {
       id: profile.id,
       email: user_email ? user_email : '',
       nickname: user_nick,
+      userlevel: 10,
     };
     try {
       const user = await this.authService.validateUser(user_id);
@@ -33,6 +34,7 @@ export class KakaoStrategy extends PassportStrategy(Strategy, 'kakao') {
         // 유저가 있을때
         const access_token = await this.authService.createLoginToken(user);
         const refresh_token = await this.authService.createRefreshToken(user);
+        done(null, user);
         return { user, access_token, refresh_token, type: 'login' };
       }
     } catch (err) {
