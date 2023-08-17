@@ -2,7 +2,6 @@ import { Injectable } from '@nestjs/common';
 import { JwtService } from '@nestjs/jwt';
 import { User } from './schemas/user.schema';
 import { UsersService } from './user.service';
-import CryptoJS from 'crypto-js';
 import { AuthRepository } from './auth.repository';
 
 @Injectable()
@@ -14,9 +13,7 @@ export class AuthService {
   ) {}
 
   async validateUser(user_id: number): Promise<any> {
-    console.log(user_id);
     const user = await this.usersService.findUserById(user_id);
-    console.log(user);
     if (!user) {
       return null;
     }
