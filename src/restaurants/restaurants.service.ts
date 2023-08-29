@@ -97,10 +97,30 @@ export class RestaurantsService {
       throw new NotFoundException(`Not Found Restaurant by id${_id}`);
     }
 
-    const images = await this.imageUploadService.uploadImage(files['image'], UPLOAD_TYPE.MENU);
-    updateMenusDto.img = images.length > 0 ? images[0] : null;
+    if (files['image'] && files['image'].length > 0) {
+      await Promise.all(
+        files['image'].map(async (file, index) => {
+          if (file.mimetype === 'application/octet-stream') {
+            return updateMenusDto.img;
+          }
+          const images = await this.imageUploadService.uploadImage(files['image'], UPLOAD_TYPE.MENU);
+
+          updateMenusDto.img = images.length > 0 ? images[0] : null;
+        }),
+      );
+    }
 
     return await this.restaurantRepository.updateMenu(_id, updateMenusDto);
+  }
+
+  async deleteMenu(_id: string, menuId: string) {
+    const restaurant: Restaurant = await this.findOne(_id);
+
+    if (!restaurant) {
+      throw new NotFoundException(`Not Found Restaurant by id${_id}`);
+    }
+
+    return await this.restaurantRepository.deleteMenu(_id, menuId);
   }
   remove(_id: string) {
     return `Remove Restaurant with id${_id}`;
