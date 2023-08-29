@@ -75,6 +75,12 @@ export class RestaurantsController {
   }
 
   @UseGuards(AuthGuard('basic'))
+  @Delete(':id/menus/:menuId')
+  async deleteMenu(@Param('id') id: string, @Param('menuId') menuId: string) {
+    return await this.restaurantService.deleteMenu(id, menuId);
+  }
+
+  @UseGuards(AuthGuard('basic'))
   @Delete(':id')
   async remove(@Param('id') id: string) {
     return this.restaurantService.remove(id);
