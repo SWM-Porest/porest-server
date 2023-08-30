@@ -7,12 +7,7 @@ import { RestaurantRepository } from './restaurants.repository';
 import { ImageUploadService } from 'src/common/uploader/image-upload.service';
 
 @Module({
-  imports: [
-    MongooseModule.forFeature([
-      { name: Restaurant.name, schema: RestaurantsSchema },
-      { name: Menu.name, schema: MenusSchema },
-    ]),
-  ],
+  imports: [MongooseModule.forFeature([{ name: Restaurant.name, schema: RestaurantsSchema }])],
   controllers: [RestaurantsController],
   providers: [RestaurantsService, RestaurantRepository, ImageUploadService],
 })
