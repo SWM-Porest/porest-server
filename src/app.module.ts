@@ -7,6 +7,7 @@ import { ConfigModule } from '@nestjs/config';
 import * as Joi from 'joi';
 import { LoggerMiddleware } from './logger/logger.middleware';
 import { AuthModule } from './auth/auth.module';
+import { OrdersModule } from './orders/orders.module';
 
 @Module({
   imports: [
@@ -22,6 +23,7 @@ import { AuthModule } from './auth/auth.module';
     RestaurantsModule,
     MongooseModule.forRoot(process.env.MONGO_URI),
     AuthModule,
+    OrdersModule,
   ],
   controllers: [AppController],
   providers: [AppService],

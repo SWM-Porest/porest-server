@@ -1,5 +1,4 @@
 import { ExecutionContext, HttpException, HttpStatus, Injectable } from '@nestjs/common';
-import { JwtService } from '@nestjs/jwt';
 import { AuthGuard } from '@nestjs/passport';
 import { UsersService } from '../user.service';
 import { AuthService } from '../auth.service';
