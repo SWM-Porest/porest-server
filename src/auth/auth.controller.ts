@@ -72,8 +72,8 @@ export class AuthController {
     status: 401,
     description: '토큰 에러',
   })
-  @UseGuards(JwtAuthGuard, RolesGuard)
   @Roles(UserRole.USER)
+  @UseGuards(JwtAuthGuard, RolesGuard)
   @Post('login')
   async registUser(@Req() req: any, @Body() RegistUserDTO: RegistUserDTO, @Res() res: Response) {
     try {
@@ -111,8 +111,7 @@ export class AuthController {
     description: '토큰 에러',
   })
   @Roles(UserRole.USER)
-  @UseGuards(JwtAuthGuard)
-  @UseGuards(RolesGuard)
+  @UseGuards(JwtAuthGuard, RolesGuard)
   @Post('update')
   async updateUser(@Req() req: any, @Body() registUserDto: RegistUserDTO) {
     try {
