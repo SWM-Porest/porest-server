@@ -44,4 +44,8 @@ export class OrdersRepository {
   async getOrdersByRestaurant(id: Types.ObjectId, status: number): Promise<Order[] | undefined> {
     return await this.Order.find({ restaurant_id: id, status }).sort({ created_at: 1 }).exec();
   }
+
+  async deleteOrder(objectId: Types.ObjectId) {
+    return await this.Order.deleteOne({ _id: objectId });
+  }
 }

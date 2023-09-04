@@ -1,5 +1,14 @@
 import { Body, Controller, Delete, Get, Param, ParseIntPipe, Patch, Post, Query, Req, UseGuards } from '@nestjs/common';
-import { ApiBearerAuth, ApiCreatedResponse, ApiForbiddenResponse, ApiOperation, ApiTags } from '@nestjs/swagger';
+import {
+  ApiBearerAuth,
+  ApiCreatedResponse,
+  ApiForbiddenResponse,
+  ApiOperation,
+  ApiParam,
+  ApiQuery,
+  ApiResponseProperty,
+  ApiTags,
+} from '@nestjs/swagger';
 import { OrdersService } from './orders.service';
 import { CreateOrdersDto } from './dto/createOrders.dto';
 import { UpdateOrdersDto } from './dto/updateOrders.dto';
@@ -47,13 +56,17 @@ export class OrdersController {
     return await this.ordersService.updateOrder(updateOrdersDto, objectId);
   }
 
+  @ApiOperation({ summary: '주문 삭제', description: '주문을 삭제하는 API입니다.' })
+  @ApiCreatedResponse({ description: '주문 삭제 성공' })
   @Roles(UserRole.RESTAURANT_MANAGER)
-  @Delete('/delete')
+  @Delete('/delete/:id')
   async deleteOrder() {
-    return await this.ordersService.deleteOrder();
+    const objectId = new Types.ObjectId();
+    return await this.ordersService.deleteOrder(objectId);
   }
 
   @ApiOperation({ summary: '고객 주문 상태 조회', description: '주문을 조회하는 API입니다.' })
+  @ApiResponseProperty({ type: Order })
   @Roles(UserRole.USER)
   @Get('/:id')
   async getOrder(@Param('id') id: string, @Req() req: any) {
@@ -65,7 +78,13 @@ export class OrdersController {
     }
   }
 
-  @ApiOperation({ summary: '고객 주문내역 조회', description: '고객의 주문내역을 조회하는 API입니다.' })
+  @ApiOperation({
+    summary: '고객 주문내역 조회',
+    description: '고객의 주문내역을 조회하는 API입니다. 본인의 주문내역만 확인 가능합니다.',
+  })
+  @ApiQuery({ name: 'page', required: true, description: '페이지 번호' })
+  @ApiQuery({ name: 'pageSize', required: true, description: '페이지당 주문 수' })
+  @ApiQuery({ name: 'sort', required: true, description: '정렬 방식 (0: 최신순, 1: 오래된순)' })
   @Roles(UserRole.USER)
   @Get('/user/:id')
   async getOrdersByUser(
@@ -79,7 +98,12 @@ export class OrdersController {
     return await this.ordersService.getOrdersByUser(id, page, pageSize, sort);
   }
 
-  @ApiOperation({ summary: '매장 주문내역 조회', description: '매장의 주문내역을 조회하는 API입니다.' })
+  @ApiOperation({ summary: '매장 주문내역 상태별 조회', description: '매장의 주문내역을 상태별 조회하는 API입니다.' })
+  @ApiQuery({
+    name: 'status',
+    required: true,
+    description: '주문 상태 (1: 주문완료, 2: 조리중, 3: 조리완료, 4: 서빙완료, 5: 결제완료)',
+  })
   @Roles(UserRole.RESTAURANT_MANAGER)
   @Get('/restaurant/:id')
   async getOrdersByRestaurant(
