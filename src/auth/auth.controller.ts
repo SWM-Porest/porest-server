@@ -1,4 +1,4 @@
-import { Controller, UseGuards, Get, Post, Body, Res, Req, Param } from '@nestjs/common';
+import { Controller, UseGuards, Get, Post, Body, Res, Req, Param, Headers } from '@nestjs/common';
 import { AuthService } from './auth.service';
 import { UsersService } from './user.service';
 import {
@@ -42,7 +42,7 @@ export class AuthController {
   })
   @UseGuards(KakaoAuthGuard)
   @Get('kakao/callback')
-  async kakaocallback(@Req() req, @Res() res: Response) {
+  async kakaocallback(@Req() req, @Res() res: Response, @Headers('Referer') referer: string) {
     if (req.user.type === 'login') {
       res.cookie('access_token', req.user.access_token, { expires: new Date(Date.now() + 1000 * 60 * 60 * 24) });
       res.cookie('refresh_token', req.user.refresh_token, {
@@ -51,7 +51,8 @@ export class AuthController {
         secure: true,
       });
     }
-    res.redirect(process.env.LOGIN_REDIRECT_URL);
+
+    res.redirect(referer);
     res.end();
   }
 
