@@ -8,7 +8,7 @@ import { RegistUserDTO } from './dto/registUser.dto';
 export class UsersRepository {
   constructor(@InjectModel('User') private readonly UserModel: Model<User>) {}
 
-  async createUser(user: User) {
+  async createUser(user: RegistUserDTO) {
     return await this.UserModel.create(user);
   }
 
@@ -26,7 +26,7 @@ export class UsersRepository {
 
   async updateUser(user: RegistUserDTO, id: string) {
     const objId = new Object(id);
-    const { _id, ...updateField } = user;
+    const { ...updateField } = user;
     return this.UserModel.findOneAndUpdate({ _id: objId }, { $set: updateField }, { new: true }).exec();
   }
 }

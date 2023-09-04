@@ -19,7 +19,7 @@ export class UsersService {
     return await this.usersRepository.findByKakaoId(id);
   }
 
-  async create(user): Promise<User> {
+  async create(user: RegistUserDTO): Promise<User> {
     return await this.usersRepository.createUser(user);
   }
 

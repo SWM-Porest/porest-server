@@ -1,13 +1,18 @@
+import { IsEnum, IsNotEmpty } from 'class-validator';
 import { Types } from 'mongoose';
 
 export class RegistUserDTO {
-  _id: Types.ObjectId;
-
   social_id: number;
 
+  social_login: string;
+
+  @IsNotEmpty()
+  @IsEnum([0, 10, 50, 100])
   userlevel: number;
 
   email: string;
 
   nickname: string;
+
+  restaurant: Types.ObjectId[];
 }
