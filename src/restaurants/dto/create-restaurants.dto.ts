@@ -1,8 +1,10 @@
 import { IsNotEmpty } from 'class-validator';
-import { Date } from 'mongoose';
-import { Menu, Menuoption } from '../schemas/restaurants.schema';
+import { Date, Types } from 'mongoose';
+import { Menu, MenuOption, Name, Item } from '../schemas/restaurants.schema';
 
 export class CreateRestaurantsDto {
+  _id: Types.ObjectId;
+
   @IsNotEmpty()
   name: string;
 
@@ -30,6 +32,8 @@ export class CreateRestaurantsDto {
 }
 
 export class CreateMenusDto {
+  _id: Types.ObjectId;
+
   @IsNotEmpty()
   name: string;
 
@@ -43,34 +47,31 @@ export class CreateMenusDto {
 
   img: object;
 
+  @IsNotEmpty()
   price: number;
+
+  isSoldOut: boolean;
+
+  menuOptions: MenuOption[];
 
   created_at: Date;
 
   updated_at: Date;
-
-  status: number;
-
-  options: Menuoption[];
-
-  get _id(): string {
-    return this._id;
-  }
 }
 
 export class CreateMenuOptionsDto {
+  _id: Types.ObjectId;
+
   @IsNotEmpty()
-  name: string;
-
-  en_name: string;
-
-  content: string;
-
-  price: string;
+  name: Name;
 
   created_at: Date;
 
   updated_at: Date;
 
-  status: number;
+  isSoldOut: boolean;
+
+  maxSelect: number;
+
+  items: Item[];
 }
