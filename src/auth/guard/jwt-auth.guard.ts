@@ -39,7 +39,7 @@ export class JwtAuthGuard extends AuthGuard('jwt') {
       response.setHeader('tokenReissue', false);
     }
     request.user = tokenValidate.user ? tokenValidate.user : tokenValidate;
-    return request.user;
+    return true;
   }
 
   async validate(token: string) {
@@ -57,7 +57,7 @@ export class JwtAuthGuard extends AuthGuard('jwt') {
         if (time_remaining < 5) {
           // 로그인 토큰의남은 시간이 5분 미만일때
           // 엑세스 토큰 정보로 유저를 찾는다.
-          const access_token_user = await this.userService.findUserById(token_verify.user_id);
+          const access_token_user = await this.userService.findUserById(token_verify.userId);
           const new_token = await this.authService.createLoginToken(access_token_user);
           return {
             user: access_token_user,
@@ -66,7 +66,7 @@ export class JwtAuthGuard extends AuthGuard('jwt') {
           };
         } else {
           // 로그인 토큰의남은 시간이 5분 이상일때
-          const user = await this.userService.findUserById(token_verify.user_id);
+          const user = await this.userService.findUserById(token_verify.userId);
           return {
             user,
             tokenReissue: false,

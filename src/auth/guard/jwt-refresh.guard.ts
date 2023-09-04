@@ -36,7 +36,6 @@ export class JwtRefreshGuard extends AuthGuard('jwt') {
       const token_verify = await this.authService.tokenValidate(refreshToken);
 
       const user = await this.userService.findUserById(token_verify.user_id);
-      console.log('i am here: ', user);
       return await this.authService.createLoginToken(user);
     } catch (error) {
       switch (error.message) {

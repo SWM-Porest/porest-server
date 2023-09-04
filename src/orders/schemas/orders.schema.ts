@@ -1,11 +1,11 @@
 import { Prop, Schema, SchemaFactory } from '@nestjs/mongoose';
-import { HydratedDocument } from 'mongoose';
+import { HydratedDocument, ObjectId } from 'mongoose';
 
 export type OrderDocument = HydratedDocument<Order>;
 
 @Schema()
 export class Order {
-  _id: string;
+  _id: ObjectId;
 
   @Prop({ required: true })
   restaurant_id: string;

@@ -13,12 +13,13 @@ export class OrdersRepository {
     return await this.Order.create(createOrdersDto);
   }
 
-  async updateOrder(updateOrdersDto: UpdateOrdersDto) {
-    return await this.Order.updateOne({ _id: updateOrdersDto._id }, updateOrdersDto);
+  async updateOrder(updateOrdersDto: UpdateOrdersDto, id: Types.ObjectId) {
+    return await this.Order.updateOne({ _id: id }, updateOrdersDto);
   }
 
   async getOrder(id: string) {
-    const order = await this.Order.findById(id).exec();
+    const _id = new Types.ObjectId(id);
+    const order = await this.Order.findById(_id).exec();
     if (order) {
       return order;
     }
