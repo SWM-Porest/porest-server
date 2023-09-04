@@ -1,29 +1,36 @@
 import { Prop, Schema, SchemaFactory } from '@nestjs/mongoose';
-import { Date, HydratedDocument } from 'mongoose';
+import { Date, HydratedDocument, Types } from 'mongoose';
 
 export type RestaurantsDocument = HydratedDocument<Restaurant>;
-@Schema()
-export class Image {
+
+export interface Image {
   filename: string;
   path: string;
   type: string;
 }
+export interface Language {
+  kr: string;
+  en: string;
+}
+
+export interface Name {
+  language: Language;
+}
+
+export interface Content {
+  language: Language;
+}
+export interface Item {
+  name: Name;
+  price: number;
+}
 @Schema()
-export class Menuoption {
-  @Prop()
-  name: string;
+export class MenuOption {
+  @Prop({ type: Types.ObjectId, required: true })
+  _id: Types.ObjectId;
 
-  @Prop()
-  en_name: string;
-
-  @Prop()
-  en_content: string;
-
-  @Prop()
-  content: string;
-
-  @Prop()
-  price: string;
+  @Prop({ type: Object, required: true })
+  name: Name;
 
   @Prop({ type: Date, default: Date.now })
   created_at: Date;
@@ -32,11 +39,20 @@ export class Menuoption {
   updated_at: Date;
 
   @Prop()
-  status: number;
-}
+  isSoldOut: boolean;
 
+  @Prop()
+  maxSelect: number;
+
+  @Prop({ type: [Object] })
+  items: Item[];
+}
+export const MenuOptionsSchema = SchemaFactory.createForClass(MenuOption);
 @Schema()
 export class Menu {
+  @Prop({ type: Types.ObjectId, required: true })
+  _id: Types.ObjectId;
+
   @Prop({ required: true })
   name: string;
 
@@ -65,19 +81,21 @@ export class Menu {
   updated_at: Date;
 
   @Prop()
-  status: number;
+  isSoldOut: boolean;
 
   @Prop()
-  options: Menuoption[];
+  isRequired: boolean;
 
-  get _id(): string {
-    return this._id;
-  }
+  @Prop({ type: [Object] })
+  menuOptions: MenuOption[];
 }
 export const MenusSchema = SchemaFactory.createForClass(Menu);
 
 @Schema()
 export class Restaurant {
+  @Prop({ type: Types.ObjectId, required: true })
+  _id: Types.ObjectId;
+
   @Prop({ required: true, index: true })
   name: string;
 

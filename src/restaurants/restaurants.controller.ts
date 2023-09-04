@@ -85,4 +85,28 @@ export class RestaurantsController {
   async remove(@Param('id') id: string) {
     return this.restaurantService.remove(id);
   }
+
+  @UseGuards(AuthGuard('basic'))
+  @Post(':id/menus/:menuId/options')
+  async addMenuOption(@Param('id') id: string, @Param('menuId') menuId: string, @Body() data: any) {
+    const createMenuOptionsDto = JSON.parse(data.createMenuOptionsDto);
+    return await this.restaurantService.addMenuOption(id, menuId, createMenuOptionsDto);
+  }
+
+  @UseGuards(AuthGuard('basic'))
+  @Patch(':id/menus/:menuId/options')
+  async updateMenuOption(@Param('id') id: string, @Param('menuId') menuId: string, @Body() data: any) {
+    const updateMenuOptionsDto = JSON.parse(data.updateMenuOptionsDto);
+    return await this.restaurantService.updateMenuOption(id, menuId, updateMenuOptionsDto);
+  }
+
+  @UseGuards(AuthGuard('basic'))
+  @Delete(':id/menus/:menuId/options/:optionId')
+  async deleteMenuOption(
+    @Param('id') id: string,
+    @Param('menuId') menuId: string,
+    @Param('optionId') optionId: string,
+  ) {
+    return await this.restaurantService.deleteMenuOption(id, menuId, optionId);
+  }
 }
