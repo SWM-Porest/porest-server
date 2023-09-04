@@ -3,10 +3,11 @@ import { HttpException, HttpStatus, Injectable } from '@nestjs/common';
 import { PutObjectCommand, S3Client } from '@aws-sdk/client-s3';
 import { UploadType } from 'aws-sdk/clients/devicefarm';
 import * as fs from 'fs';
+import { Image } from 'src/restaurants/schemas/restaurants.schema';
 
 @Injectable()
 export class ImageUploadService {
-  uploadImage(files: Express.Multer.File[], upload_type: UploadType): Promise<string[]> {
+  uploadImage(files: Express.Multer.File[], upload_type: UploadType): Promise<Image[]> {
     if (!files || files.length === 0) {
       return Promise.resolve([]);
     } else {
@@ -20,7 +21,7 @@ export class ImageUploadService {
     return Date.now() + '_' + file.originalname.replace(/ /g, '-');
   }
 
-  private async uploadImagelocal(files: Express.Multer.File[], upload_type: UploadType): Promise<string[]> {
+  private async uploadImagelocal(files: Express.Multer.File[], upload_type: UploadType): Promise<Image[]> {
     return files.map((file) => {
       const savedFilename: string = this.convertFileName(file);
       const path: string = process.env.LOCAL_IMAGE_PATH + upload_type;
@@ -34,11 +35,15 @@ export class ImageUploadService {
         throw new HttpException('Failed to upload the image to local.', HttpStatus.INTERNAL_SERVER_ERROR);
       }
 
-      return process.env.UPLOAD_PATH + savedFilename;
+      return {
+        filename: savedFilename,
+        path: process.env.UPLOAD_PATH + upload_type + savedFilename,
+        type: file.mimetype,
+      };
     });
   }
 
-  private async uploadImageAWSS3(files: Express.Multer.File[], upload_type: UploadType): Promise<string[]> {
+  private async uploadImageAWSS3(files: Express.Multer.File[], upload_type: UploadType): Promise<Image[]> {
     const s3Client = new S3Client({
       region: process.env.AWS_REGION,
       credentials: {
@@ -64,7 +69,11 @@ export class ImageUploadService {
           throw new HttpException('Failed to upload the image to AWS S3.', HttpStatus.INTERNAL_SERVER_ERROR);
         }
 
-        return process.env.AWS_UPLOAD_PATH + upload_type + savedFilename;
+        return {
+          filename: savedFilename,
+          path: process.env.AWS_UPLOAD_PATH + upload_type + savedFilename,
+          type: file.mimetype,
+        };
       }),
     );
   }

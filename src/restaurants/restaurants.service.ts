@@ -1,6 +1,6 @@
 import { HttpException, HttpStatus, Injectable, NotFoundException } from '@nestjs/common';
 import { CreateMenusDto, CreateRestaurantsDto } from './dto/create-restaurants.dto';
-import { UpdateRestaurantsDto } from './dto/update-restaurants.dto';
+import { UpdateMenusDto, UpdateRestaurantsDto } from './dto/update-restaurants.dto';
 import { Types } from 'mongoose';
 import { RestaurantRepository } from './restaurants.repository';
 import { Restaurant } from './schemas/restaurants.schema';
@@ -21,8 +21,8 @@ export class RestaurantsService {
       throw new HttpException('Name is Duplicated', HttpStatus.CONFLICT);
     }
 
-    const bannerImageUrls = await this.imageUploadService.uploadImage(files['image'], UPLOAD_TYPE.RESTAURANT_BANNER);
-    createRestaurantsDto.banner_image_urls = bannerImageUrls;
+    const bannerImages = await this.imageUploadService.uploadImage(files['image'], UPLOAD_TYPE.RESTAURANT_BANNER);
+    createRestaurantsDto.banner_images = bannerImages;
 
     return this.restaurantRepository.createRestaurant(createRestaurantsDto);
   }
@@ -44,12 +44,35 @@ export class RestaurantsService {
     }
   }
 
-  async update(_id: string, updateRestaurantsDto: UpdateRestaurantsDto, files: Express.Multer.File[]) {
-    const banner_image_urls = await this.imageUploadService.uploadImage(files['image'], UPLOAD_TYPE.RESTAURANT_BANNER);
+  async update(
+    _id: string,
+    updateRestaurantsDto: UpdateRestaurantsDto,
+    files: { image?: Express.Multer.File[]; menuImage?: Express.Multer.File[] },
+  ) {
+    // TODO: 이름 정책 어떻게 할 건지
+    // if (await this.restaurantRepository.isExistRestaurant(updateRestaurantsDto.name)) {
+    //   throw new HttpException('Name is Duplicated', HttpStatus.CONFLICT);
+    // }
 
-    if (banner_image_urls.length > 0) {
-      updateRestaurantsDto.banner_image_urls = banner_image_urls;
+    const banner_images = await this.imageUploadService.uploadImage(files['image'], UPLOAD_TYPE.RESTAURANT_BANNER);
+
+    if (files['menuImage']) {
+      const menuImageUploadPromises = files['menuImage'].map(async (file, index) => {
+        if (file.mimetype === 'application/octet-stream') {
+          return updateRestaurantsDto.menus[index].img;
+        }
+        const images = await this.imageUploadService.uploadImage([file], UPLOAD_TYPE.MENU);
+        updateRestaurantsDto.menus[index].img = images.length > 0 ? images[0] : null;
+      });
+
+      await Promise.all(menuImageUploadPromises);
     }
+
+    if (!updateRestaurantsDto.banner_images) {
+      updateRestaurantsDto.banner_images = [];
+    }
+
+    updateRestaurantsDto.banner_images = [...updateRestaurantsDto.banner_images, ...banner_images];
 
     return this.restaurantRepository.updateRestaurant(_id, updateRestaurantsDto);
   }
@@ -61,12 +84,44 @@ export class RestaurantsService {
       throw new NotFoundException(`Not Found Restaurant by id${_id}`);
     }
 
-    const image_urls = await this.imageUploadService.uploadImage(files['image'], UPLOAD_TYPE.MENU);
-    createMenusDto.img = image_urls.length > 0 ? image_urls[0] : '';
+    const images = await this.imageUploadService.uploadImage(files['image'], UPLOAD_TYPE.MENU);
+    createMenusDto.img = images.length > 0 ? images[0] : null;
 
     return await this.restaurantRepository.addMenu(_id, createMenusDto);
   }
 
+  async updateMenu(_id: string, updateMenusDto: UpdateMenusDto, files: Express.Multer.File[]) {
+    const restaurant: Restaurant = await this.findOne(_id);
+
+    if (!restaurant) {
+      throw new NotFoundException(`Not Found Restaurant by id${_id}`);
+    }
+
+    if (files['image'] && files['image'].length > 0) {
+      await Promise.all(
+        files['image'].map(async (file, index) => {
+          if (file.mimetype === 'application/octet-stream') {
+            return updateMenusDto.img;
+          }
+          const images = await this.imageUploadService.uploadImage(files['image'], UPLOAD_TYPE.MENU);
+
+          updateMenusDto.img = images.length > 0 ? images[0] : null;
+        }),
+      );
+    }
+
+    return await this.restaurantRepository.updateMenu(_id, updateMenusDto);
+  }
+
+  async deleteMenu(_id: string, menuId: string) {
+    const restaurant: Restaurant = await this.findOne(_id);
+
+    if (!restaurant) {
+      throw new NotFoundException(`Not Found Restaurant by id${_id}`);
+    }
+
+    return await this.restaurantRepository.deleteMenu(_id, menuId);
+  }
   remove(_id: string) {
     return `Remove Restaurant with id${_id}`;
   }
