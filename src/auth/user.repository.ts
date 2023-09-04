@@ -13,15 +13,20 @@ export class UsersRepository {
   }
 
   async findById(id: number) {
-    return this.UserModel.findOne({ id }).exec();
+    return this.UserModel.findById(id).exec();
   }
 
   async findByEmail(email: string) {
     return this.UserModel.findOne({ email }).exec();
   }
 
-  async updateUser(user: RegistUserDTO) {
-    const { id, ...updateField } = user;
-    return this.UserModel.findOneAndUpdate({ id }, { $set: updateField }, { new: true }).exec();
+  async findByKakaoId(id: number) {
+    return await this.UserModel.findOne({ social_id: id, social_login: 'kakao' }).exec();
+  }
+
+  async updateUser(user: RegistUserDTO, id: string) {
+    const objId = new Object(id);
+    const { _id, ...updateField } = user;
+    return this.UserModel.findOneAndUpdate({ _id: objId }, { $set: updateField }, { new: true }).exec();
   }
 }

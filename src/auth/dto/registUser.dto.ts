@@ -1,9 +1,9 @@
-import { IsNotEmpty, IsNumber } from 'class-validator';
+import { Types } from 'mongoose';
 
 export class RegistUserDTO {
-  @IsNumber()
-  @IsNotEmpty()
-  id: number;
+  _id: Types.ObjectId;
+
+  social_id: number;
 
   userlevel: number;
 

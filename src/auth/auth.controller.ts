@@ -1,4 +1,4 @@
-import { Controller, UseGuards, Get, Post, Body, Res, Req } from '@nestjs/common';
+import { Controller, UseGuards, Get, Post, Body, Res, Req, Param } from '@nestjs/common';
 import { AuthService } from './auth.service';
 import { UsersService } from './user.service';
 import {
@@ -87,6 +87,7 @@ export class AuthController {
   }
 
   // 리프레쉬 토큰을 이용한 엑세스 토큰 재발급하기
+  @ApiBearerAuth('refresh-token')
   @UseGuards(JwtRefreshGuard)
   @Get('refresh-accesstoken')
   async refreshAccessToken() {
@@ -112,10 +113,10 @@ export class AuthController {
   })
   @Roles(UserRole.USER)
   @UseGuards(JwtAuthGuard, RolesGuard)
-  @Post('update')
-  async updateUser(@Req() req: any, @Body() registUserDto: RegistUserDTO) {
+  @Post('update/:id')
+  async updateUser(@Param('id') id: string, @Body() registUserDto: RegistUserDTO) {
     try {
-      return await this.usersService.update(registUserDto);
+      return await this.usersService.update(registUserDto, id);
     } catch (error) {
       console.log(error);
     }

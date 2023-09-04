@@ -12,14 +12,18 @@ export class UsersService {
   }
 
   async findUserById(id: number): Promise<User | undefined> {
-    return await this.usersRepository.findById(id);
+    return this.usersRepository.findById(id);
+  }
+
+  async findUserByKakaoId(id: number): Promise<User | undefined> {
+    return await this.usersRepository.findByKakaoId(id);
   }
 
   async create(user): Promise<User> {
     return await this.usersRepository.createUser(user);
   }
 
-  async update(user: RegistUserDTO): Promise<User> {
-    return await this.usersRepository.updateUser(user);
+  async update(user: RegistUserDTO, id: string): Promise<User> {
+    return await this.usersRepository.updateUser(user, id);
   }
 }

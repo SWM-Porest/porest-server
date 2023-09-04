@@ -3,7 +3,6 @@ import { Strategy } from 'passport-kakao';
 import { PassportStrategy } from '@nestjs/passport';
 import { AuthService } from '../auth.service';
 import { UsersService } from '../user.service';
-import { User } from '../schemas/user.schema';
 
 @Injectable()
 export class KakaoStrategy extends PassportStrategy(Strategy, 'kakao') {
@@ -27,7 +26,7 @@ export class KakaoStrategy extends PassportStrategy(Strategy, 'kakao') {
       restaurant: [],
     };
     try {
-      const user = await this.authService.validateUser(user_id);
+      const user = await this.authService.validateKakaoUser(user_id);
       if (user === null) {
         // 유저가 없을때
         const newUser = await this.userService.create(user_profile);
