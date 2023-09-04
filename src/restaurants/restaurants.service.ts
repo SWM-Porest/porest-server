@@ -1,5 +1,5 @@
 import { HttpException, HttpStatus, Injectable, NotFoundException } from '@nestjs/common';
-import { CreateMenusDto, CreateRestaurantsDto } from './dto/create-restaurants.dto';
+import { CreateMenuOptionsDto, CreateMenusDto, CreateRestaurantsDto } from './dto/create-restaurants.dto';
 import { UpdateMenusDto, UpdateRestaurantsDto } from './dto/update-restaurants.dto';
 import { Types } from 'mongoose';
 import { RestaurantRepository } from './restaurants.repository';
@@ -122,6 +122,37 @@ export class RestaurantsService {
 
     return await this.restaurantRepository.deleteMenu(_id, menuId);
   }
+
+  async addMenuOption(_id: string, menuId: string, createMenuOptionsDto: CreateMenuOptionsDto): Promise<Restaurant> {
+    const restaurant: Restaurant = await this.findOne(_id);
+
+    if (!restaurant) {
+      throw new NotFoundException(`Not Found Restaurant by id${_id}`);
+    }
+
+    return await this.restaurantRepository.addMenuOption(_id, menuId, createMenuOptionsDto);
+  }
+
+  async updateMenuOption(_id: string, menuId: string, updateMenuOptionDto: CreateMenuOptionsDto): Promise<Restaurant> {
+    const restaurant: Restaurant = await this.findOne(_id);
+
+    if (!restaurant) {
+      throw new NotFoundException(`Not Found Restaurant by id${_id}`);
+    }
+
+    return await this.restaurantRepository.updateMenuOption(_id, menuId, updateMenuOptionDto);
+  }
+
+  async deleteMenuOption(_id: string, menuId: string, menuOptionId: string): Promise<Restaurant> {
+    const restaurant: Restaurant = await this.findOne(_id);
+
+    if (!restaurant) {
+      throw new NotFoundException(`Not Found Restaurant by id${_id}`);
+    }
+
+    return await this.restaurantRepository.deleteMenuOption(_id, menuId, menuOptionId);
+  }
+
   remove(_id: string) {
     return `Remove Restaurant with id${_id}`;
   }
