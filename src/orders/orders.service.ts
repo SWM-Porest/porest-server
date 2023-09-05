@@ -4,10 +4,11 @@ import { CreateOrdersDto } from './dto/createOrders.dto';
 import { UpdateOrdersDto } from './dto/updateOrders.dto';
 import { Order } from './schemas/orders.schema';
 import { Types, isValidObjectId } from 'mongoose';
+import { UsersService } from 'src/auth/user.service';
 
 @Injectable()
 export class OrdersService {
-  constructor(private readonly ordersRepository: OrdersRepository) {}
+  constructor(private readonly ordersRepository: OrdersRepository, private readonly usersService: UsersService) {}
 
   async createOrder(createOrdersDto: CreateOrdersDto): Promise<Order> {
     return await this.ordersRepository.createOrder(createOrdersDto);
@@ -21,7 +22,7 @@ export class OrdersService {
     return await this.ordersRepository.deleteOrder(objectId);
   }
 
-  async getOrder(id: string) {
+  async getOrder(id: Types.ObjectId) {
     if (isValidObjectId(id)) {
       return await this.ordersRepository.getOrder(id);
     }
@@ -32,25 +33,26 @@ export class OrdersService {
     return 'getOrders';
   }
 
-  async getOrdersByUser(id: Types.ObjectId, page: number, pageSize: number, sort: number) {
+  async getOrdersByUser(id: string, page: number, pageSize: number, sort: number) {
     return await this.ordersRepository.getOrdersByUser(id, page, pageSize, sort);
   }
 
-  async getOrdersByRestaurant(id: Types.ObjectId, status: number) {
-    return await this.ordersRepository.getOrdersByRestaurant(id, status);
+  async getOrdersByRestaurant(id: string, status: number) {
+    return await this.ordersRepository.getOrdersByRestaurant(new Types.ObjectId(id), status);
   }
 
   async validateUser(id: Types.ObjectId, user_id: Types.ObjectId) {
     if (id.equals(user_id)) {
       return true;
     }
-    throw new BadRequestException('해당 주문에 대한 권한이 없습니다.');
+    throw new BadRequestException('해당 요청에 대한 권한이 없습니다.');
   }
 
-  async validateRestaurant(id: Types.ObjectId, restaurant_id: Types.ObjectId) {
-    if (id.equals(restaurant_id)) {
+  async validateRestaurant(user_id: string, restaurant_id: string) {
+    const user = await this.usersService.findUserById(user_id);
+    if (user.restaurant.includes(restaurant_id)) {
       return true;
     }
-    throw new BadRequestException('해당 주문에 대한 권한이 없습니다.');
+    throw new BadRequestException('해당 요청에 대한 권한이 없습니다.');
   }
 }

@@ -1,12 +1,12 @@
 import { IsEnum, IsNotEmpty } from 'class-validator';
-import { Mixed, ObjectId } from 'mongoose';
+import { Mixed } from 'mongoose';
 import { OrderStatus } from '../schemas/orders.schema';
 import { ApiProperty } from '@nestjs/swagger';
 
 export class UpdateOrdersDto {
   @ApiProperty({ example: 'ObjectId', description: '수정할 레스토랑의 ID', required: true })
   @IsNotEmpty()
-  _id: ObjectId;
+  id: string;
 
   @ApiProperty({ example: 'ObjectId', description: '수정할 유저의 ID', required: false })
   user_id: string;
@@ -18,7 +18,6 @@ export class UpdateOrdersDto {
   menus: Mixed;
 
   @ApiProperty({ example: 1, description: '수정할 주문의 상태', required: true })
-  @IsNotEmpty()
   @IsEnum(OrderStatus)
   status: number;
 }

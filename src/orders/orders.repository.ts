@@ -17,8 +17,7 @@ export class OrdersRepository {
     return await this.Order.updateOne({ _id: id }, updateOrdersDto);
   }
 
-  async getOrder(id: string) {
-    const _id = new Types.ObjectId(id);
+  async getOrder(_id: Types.ObjectId) {
     const order = await this.Order.findById(_id).exec();
     if (order) {
       return order;
@@ -26,12 +25,7 @@ export class OrdersRepository {
     throw new NotFoundException('해당 주문이 존재하지 않습니다.');
   }
 
-  async getOrdersByUser(
-    id: Types.ObjectId,
-    page: number,
-    pageSize: number,
-    sort: number,
-  ): Promise<Order[] | undefined> {
+  async getOrdersByUser(id: string, page: number, pageSize: number, sort: number): Promise<Order[] | undefined> {
     const startIndex = (page - 1) * pageSize;
     const endIndex = page * pageSize;
     return await this.Order.find({ user_id: id })
