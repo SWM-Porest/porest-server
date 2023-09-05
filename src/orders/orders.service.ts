@@ -22,9 +22,9 @@ export class OrdersService {
     return await this.ordersRepository.deleteOrder(objectId);
   }
 
-  async getOrder(id: Types.ObjectId) {
-    if (isValidObjectId(id)) {
-      return await this.ordersRepository.getOrder(id);
+  async getOrder(_id: Types.ObjectId) {
+    if (isValidObjectId(_id)) {
+      return await this.ordersRepository.getOrder(_id);
     }
     throw new BadRequestException('id의 Type이 올바르지 않습니다.');
   }

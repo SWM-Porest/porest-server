@@ -1,18 +1,4 @@
-import {
-  BadRequestException,
-  Body,
-  Controller,
-  Delete,
-  Get,
-  Param,
-  ParseIntPipe,
-  Patch,
-  Post,
-  Query,
-  Req,
-  UnauthorizedException,
-  UseGuards,
-} from '@nestjs/common';
+import { Body, Controller, Delete, Get, Param, ParseIntPipe, Patch, Post, Query, Req, UseGuards } from '@nestjs/common';
 import {
   ApiBearerAuth,
   ApiCreatedResponse,
@@ -25,14 +11,12 @@ import {
 import { OrdersService } from './orders.service';
 import { CreateOrdersDto } from './dto/createOrders.dto';
 import { UpdateOrdersDto } from './dto/updateOrders.dto';
-import { ParseObjectIdPipe } from 'src/common/pipes/parse-object-id.pipe';
 import { Types } from 'mongoose';
 import { JwtAuthGuard } from 'src/auth/guard/jwt-auth.guard';
 import { Roles } from 'src/auth/decorator/roles.decorator';
 import { UserRole } from 'src/auth/schemas/user.schema';
 import { RolesGuard } from 'src/auth/guard/roles.guard';
 import { Order } from './schemas/orders.schema';
-import { Request } from 'express';
 
 @Controller('orders')
 @ApiTags('주문 API')
@@ -67,7 +51,7 @@ export class OrdersController {
   @Roles(UserRole.RESTAURANT_MANAGER)
   @Patch()
   async updateOrder(@Req() req: any, @Body() updateOrdersDto: UpdateOrdersDto) {
-    const objectId = new Types.ObjectId(updateOrdersDto.id);
+    const objectId = new Types.ObjectId(updateOrdersDto._id);
     const order = await this.ordersService.getOrder(objectId);
     await this.ordersService.validateRestaurant(req.user.userId, order.restaurant_id);
     return await this.ordersService.updateOrder(updateOrdersDto, objectId);
