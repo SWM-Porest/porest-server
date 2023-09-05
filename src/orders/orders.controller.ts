@@ -61,8 +61,8 @@ export class OrdersController {
   @ApiCreatedResponse({ description: '주문 삭제 성공' })
   @Roles(UserRole.RESTAURANT_MANAGER)
   @Delete('/delete/:id')
-  async deleteOrder() {
-    const objectId = new Types.ObjectId();
+  async deleteOrder(@Param('id') id: string) {
+    const objectId = new Types.ObjectId(id);
     return await this.ordersService.deleteOrder(objectId);
   }
 

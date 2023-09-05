@@ -18,8 +18,8 @@ export class OrdersService {
     return await this.ordersRepository.updateOrder(updateOrdersDto, id);
   }
 
-  async deleteOrder(objectId: Types.ObjectId) {
-    return await this.ordersRepository.deleteOrder(objectId);
+  async deleteOrder(_id: Types.ObjectId) {
+    return await this.ordersRepository.deleteOrder(_id);
   }
 
   async getOrder(_id: Types.ObjectId) {
