@@ -1,6 +1,6 @@
 import { IsNotEmpty } from 'class-validator';
 import { Date, Types } from 'mongoose';
-import { Menu, MenuOption, Name, Item } from '../schemas/restaurants.schema';
+import { Menu, MenuOption, Name, Item, Image } from '../schemas/restaurants.schema';
 
 export class CreateRestaurantsDto {
   _id: Types.ObjectId;
@@ -18,7 +18,7 @@ export class CreateRestaurantsDto {
 
   phone_number: string;
 
-  banner_images: object[];
+  banner_images: Image[];
 
   address: string;
 
@@ -45,7 +45,7 @@ export class CreateMenusDto {
 
   description: string;
 
-  img: object;
+  img: Image;
 
   @IsNotEmpty()
   price: number;
