@@ -3,11 +3,12 @@ import { Date, HydratedDocument, Types } from 'mongoose';
 
 export type RestaurantsDocument = HydratedDocument<Restaurant>;
 
-export interface Image {
+export type Image = {
   filename: string;
   path: string;
   type: string;
-}
+};
+
 export interface Language {
   kr: string;
   en: string;
