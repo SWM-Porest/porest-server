@@ -1,0 +1,89 @@
+import { OrdersController } from './orders.controller';
+import { OrdersRepository } from './orders.repository';
+import { OrdersService } from './orders.service';
+import { Test, TestingModule } from '@nestjs/testing';
+import { Order } from './schemas/orders.schema';
+import { Types } from 'mongoose';
+import { CreateOrdersDto } from './dto/createOrders.dto';
+import { UsersService } from 'src/auth/user.service';
+import { AuthService } from 'src/auth/auth.service';
+
+jest.mock('./orders.service.ts');
+
+describe('OrdersController', () => {
+  let ordersController: OrdersController;
+  let ordersService: OrdersService;
+  const order = new Order();
+  order._id = new Types.ObjectId('60b6d1b0b9b3b1b4e8b8b0b1');
+  order.created_at = new Date();
+  order.menus = JSON.parse('{"menu_id": "value"}');
+  order.restaurant_id = '60b6d1b0b9b3b1b4e8b8b0b2';
+  order.restaurant_name = 'test';
+  order.status = 1;
+  order.table_id = 1;
+  order.updated_at = new Date();
+  order.user_id = '60b6d1b0b9b3b1b4e8b8b0b3';
+
+  const dtoToSchema = (dto: CreateOrdersDto): Order => {
+    const order = new Order();
+    order._id = dto._id;
+    order.restaurant_id = dto.restaurant_id;
+    order.restaurant_name = dto.restaurant_name;
+    order.user_id = dto.user_id;
+    order.menus = dto.menus;
+    order.status = dto.status;
+    order.table_id = dto.table_id;
+    return order;
+  };
+
+  const RestaurantDtoStub = (): CreateOrdersDto => {
+    return {
+      _id: undefined,
+      restaurant_id: '',
+      restaurant_name: 'test',
+      user_id: '',
+      status: 1,
+      table_id: 1,
+      menus: JSON.parse('{"menu_id": "value"}'),
+    };
+  };
+
+  beforeAll(async () => {
+    const module: TestingModule = await Test.createTestingModule({
+      controllers: [OrdersController],
+      providers: [
+        OrdersService,
+        {
+          provide: UsersService,
+          useValue: {},
+        },
+        {
+          provide: AuthService,
+          useValue: {},
+        },
+        {
+          provide: OrdersRepository,
+          useValue: {},
+        },
+      ],
+    }).compile();
+
+    ordersService = module.get<OrdersService>(OrdersService);
+    ordersController = new OrdersController(ordersService);
+    jest.clearAllMocks();
+  });
+
+  describe('POST /orders', () => {
+    it('create order', async () => {
+      jest.spyOn(ordersService, 'createOrder').mockImplementation(() => Promise.resolve(order));
+      const request = {
+        user: {
+          userId: '60b6d1b0b9b3b1b4e8b8b0b3',
+        },
+      };
+      const received = await ordersController.createOrder({ ...RestaurantDtoStub() }, request);
+
+      expect(received).toBe(order);
+    });
+  });
+});

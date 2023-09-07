@@ -14,5 +14,5 @@ export class RegistUserDTO {
 
   nickname: string;
 
-  restaurant: Types.ObjectId[];
+  restaurants_id: Types.ObjectId[];
 }

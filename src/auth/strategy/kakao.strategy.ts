@@ -24,7 +24,7 @@ export class KakaoStrategy extends PassportStrategy(Strategy, 'kakao') {
       email: user_email ? user_email : '',
       nickname: user_nick,
       userlevel: 10,
-      restaurant: [],
+      restaurants_id: [],
     };
     try {
       const user = await this.authService.validateKakaoUser(user_id);

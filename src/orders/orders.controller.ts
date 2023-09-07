@@ -50,7 +50,7 @@ export class OrdersController {
   @ApiCreatedResponse({ description: '주문 수정 성공', type: Order })
   @Roles(UserRole.RESTAURANT_MANAGER)
   @Patch()
-  async updateOrder(@Req() req: any, @Body() updateOrdersDto: UpdateOrdersDto) {
+  async updateOrder(@Req() req: any, @Body() updateOrdersDto: UpdateOrdersDto): Promise<Order> {
     const objectId = new Types.ObjectId(updateOrdersDto._id);
     const order = await this.ordersService.getOrder(objectId);
     await this.ordersService.validateRestaurant(req.user.userId, order.restaurant_id);

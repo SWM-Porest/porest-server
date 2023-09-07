@@ -1,5 +1,5 @@
 import { IsEnum } from 'class-validator';
-import { Mixed } from 'mongoose';
+import { Schema } from 'mongoose';
 import { OrderStatus } from '../schemas/orders.schema';
 import { ApiProperty } from '@nestjs/swagger';
 
@@ -8,7 +8,7 @@ export class UpdateOrdersDto {
   _id: string;
 
   @ApiProperty({ example: '수정된 메뉴들', description: '수정된 메뉴들', required: false })
-  menus: Mixed;
+  menus: Schema.Types.Mixed;
 
   @ApiProperty({ example: 1, description: '수정할 주문의 상태', required: true })
   @IsEnum(OrderStatus)

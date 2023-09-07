@@ -1,11 +1,11 @@
 import { Prop, Schema, SchemaFactory } from '@nestjs/mongoose';
-import { HydratedDocument, ObjectId } from 'mongoose';
+import { HydratedDocument, Schema as mSchema, Types } from 'mongoose';
 
 export type OrderDocument = HydratedDocument<Order>;
 
 @Schema()
 export class Order {
-  _id: ObjectId;
+  _id: Types.ObjectId;
 
   @Prop({ required: true })
   restaurant_id: string;
@@ -16,8 +16,8 @@ export class Order {
   @Prop({ required: true })
   user_id: string;
 
-  @Prop({ required: true, type: Object })
-  menus: object;
+  @Prop({ required: true })
+  menus: mSchema.Types.Mixed;
 
   @Prop({ required: true, default: 1 })
   status: number;

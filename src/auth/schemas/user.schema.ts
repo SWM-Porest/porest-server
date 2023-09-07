@@ -20,7 +20,7 @@ export class User {
   nickname: string;
 
   @Prop()
-  restaurant: string[];
+  restaurants_id: string[];
 }
 
 export const UserSchema = SchemaFactory.createForClass(User);

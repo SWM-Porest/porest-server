@@ -14,7 +14,7 @@ export class OrdersService {
     return await this.ordersRepository.createOrder(createOrdersDto);
   }
 
-  async updateOrder(updateOrdersDto: UpdateOrdersDto, id: Types.ObjectId): Promise<any> {
+  async updateOrder(updateOrdersDto: UpdateOrdersDto, id: Types.ObjectId): Promise<Order> {
     return await this.ordersRepository.updateOrder(updateOrdersDto, id);
   }
 
@@ -37,7 +37,7 @@ export class OrdersService {
     return await this.ordersRepository.getOrdersByUser(id, page, pageSize, sort);
   }
 
-  async getOrdersByRestaurant(id: string, status: number) {
+  async getOrdersByRestaurant(id: string, status: number): Promise<Order[]> {
     return await this.ordersRepository.getOrdersByRestaurant(new Types.ObjectId(id), status);
   }
 
@@ -50,7 +50,7 @@ export class OrdersService {
 
   async validateRestaurant(user_id: string, restaurant_id: string) {
     const user = await this.usersService.findUserById(user_id);
-    if (user.restaurant.includes(restaurant_id)) {
+    if (user.restaurants_id.includes(restaurant_id)) {
       return true;
     }
     throw new BadRequestException('해당 요청에 대한 권한이 없습니다.');

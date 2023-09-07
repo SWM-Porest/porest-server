@@ -1,4 +1,4 @@
-import { Injectable, NotFoundException } from '@nestjs/common';
+import { BadRequestException, Injectable, NotFoundException } from '@nestjs/common';
 import { Model, Types } from 'mongoose';
 import { Order } from './schemas/orders.schema';
 import { InjectModel } from '@nestjs/mongoose';
@@ -13,8 +13,12 @@ export class OrdersRepository {
     return await this.Order.create(createOrdersDto);
   }
 
-  async updateOrder(updateOrdersDto: UpdateOrdersDto, id: Types.ObjectId) {
-    return await this.Order.updateOne({ _id: id }, updateOrdersDto);
+  async updateOrder(updateOrdersDto: UpdateOrdersDto, id: Types.ObjectId): Promise<Order> {
+    const isupdated = (await this.Order.updateOne({ _id: id }, updateOrdersDto)).acknowledged;
+    if (!isupdated) {
+      throw new BadRequestException('주문 수정에 실패했습니다.');
+    }
+    return this.getOrder(id);
   }
 
   async getOrder(_id: Types.ObjectId) {
@@ -35,11 +39,15 @@ export class OrdersRepository {
       .exec();
   }
 
-  async getOrdersByRestaurant(id: Types.ObjectId, status: number): Promise<Order[] | undefined> {
+  async getOrdersByRestaurant(id: Types.ObjectId, status: number): Promise<Order[]> {
     return await this.Order.find({ restaurant_id: id, status }).sort({ created_at: 1 }).exec();
   }
 
   async deleteOrder(_id: Types.ObjectId) {
-    return await this.Order.deleteOne({ _id });
+    const result = await this.Order.deleteOne({ _id }).exec();
+    if (result.deletedCount === 0) {
+      throw new NotFoundException('해당 주문이 존재하지 않습니다.');
+    }
+    return { message: '주문이 삭제 되었습니다..' };
   }
 }
