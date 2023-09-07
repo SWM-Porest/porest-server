@@ -62,7 +62,12 @@ export class RestaurantsService {
           return updateRestaurantsDto.menus[index].img;
         }
         const images = await this.imageUploadService.uploadImage([file], UPLOAD_TYPE.MENU);
-        updateRestaurantsDto.menus[index].img = images.length > 0 ? images[0] : null;
+        if (
+          updateRestaurantsDto.menus &&
+          updateRestaurantsDto.menus.length > index &&
+          updateRestaurantsDto.menus[index].img
+        )
+          updateRestaurantsDto.menus[index].img = images.length > 0 ? images[0] : null;
       });
 
       await Promise.all(menuImageUploadPromises);
