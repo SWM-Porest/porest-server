@@ -5,6 +5,7 @@ import { UpdateOrdersDto } from './dto/updateOrders.dto';
 import { Order } from './schemas/orders.schema';
 import { Types, isValidObjectId } from 'mongoose';
 import { UsersService } from 'src/auth/user.service';
+import { GetOrdersByUser } from './dto/getOrdersByUser.dto';
 
 @Injectable()
 export class OrdersService {
@@ -22,7 +23,7 @@ export class OrdersService {
     return await this.ordersRepository.deleteOrder(_id);
   }
 
-  async getOrder(_id: Types.ObjectId) {
+  async getOrder(_id: Types.ObjectId): Promise<Order> {
     if (isValidObjectId(_id)) {
       return await this.ordersRepository.getOrder(_id);
     }
@@ -33,7 +34,7 @@ export class OrdersService {
     return 'getOrders';
   }
 
-  async getOrdersByUser(id: string, page: number, pageSize: number, sort: number) {
+  async getOrdersByUser(id: string, page: number, pageSize: number, sort: number): Promise<GetOrdersByUser> {
     return await this.ordersRepository.getOrdersByUser(id, page, pageSize, sort);
   }
 

@@ -17,6 +17,7 @@ import { Roles } from 'src/auth/decorator/roles.decorator';
 import { UserRole } from 'src/auth/schemas/user.schema';
 import { RolesGuard } from 'src/auth/guard/roles.guard';
 import { Order } from './schemas/orders.schema';
+import { GetOrdersByUser } from './dto/getOrdersByUser.dto';
 
 @Controller('orders')
 @ApiTags('주문 API')
@@ -52,8 +53,7 @@ export class OrdersController {
   @Patch()
   async updateOrder(@Req() req: any, @Body() updateOrdersDto: UpdateOrdersDto): Promise<Order> {
     const objectId = new Types.ObjectId(updateOrdersDto._id);
-    const order = await this.ordersService.getOrder(objectId);
-    await this.ordersService.validateRestaurant(req.user.userId, order.restaurant_id);
+    await this.ordersService.validateRestaurant(req.user.userId, req.user.restaurantsId);
     return await this.ordersService.updateOrder(updateOrdersDto, objectId);
   }
 
@@ -80,7 +80,7 @@ export class OrdersController {
     @Query('pageSize', ParseIntPipe) pageSize: number,
     @Query('sort', ParseIntPipe) sort: number,
     @Req() req: any,
-  ) {
+  ): Promise<GetOrdersByUser> {
     return await this.ordersService.getOrdersByUser(req.user.userId, page, pageSize, sort);
   }
 
@@ -101,7 +101,7 @@ export class OrdersController {
   @ApiResponseProperty({ type: Order })
   @Roles(UserRole.USER)
   @Get('/:id')
-  async getOrder(@Param('id') id: string) {
+  async getOrder(@Param('id') id: string): Promise<Order> {
     try {
       return await this.ordersService.getOrder(new Types.ObjectId(id));
     } catch (err) {

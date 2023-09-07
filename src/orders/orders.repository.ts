@@ -4,6 +4,7 @@ import { Order } from './schemas/orders.schema';
 import { InjectModel } from '@nestjs/mongoose';
 import { CreateOrdersDto } from './dto/createOrders.dto';
 import { UpdateOrdersDto } from './dto/updateOrders.dto';
+import { GetOrdersByUser } from './dto/getOrdersByUser.dto';
 
 @Injectable()
 export class OrdersRepository {
@@ -21,7 +22,7 @@ export class OrdersRepository {
     return this.getOrder(id);
   }
 
-  async getOrder(_id: Types.ObjectId) {
+  async getOrder(_id: Types.ObjectId): Promise<Order> {
     const order = await this.Order.findById(_id).exec();
     if (order) {
       return order;
@@ -29,14 +30,15 @@ export class OrdersRepository {
     throw new NotFoundException('해당 주문이 존재하지 않습니다.');
   }
 
-  async getOrdersByUser(id: string, page: number, pageSize: number, sort: number): Promise<Order[] | undefined> {
+  async getOrdersByUser(id: string, page: number, pageSize: number, sort: number): Promise<GetOrdersByUser> {
     const startIndex = (page - 1) * pageSize;
     const endIndex = page * pageSize;
-    return await this.Order.find({ user_id: id })
+    const orders = await this.Order.find({ user_id: id })
       .sort({ created_at: sort ? 1 : -1 })
       .skip(startIndex)
       .limit(endIndex)
       .exec();
+    return { orders, page, pageSize, sort };
   }
 
   async getOrdersByRestaurant(id: Types.ObjectId, status: number): Promise<Order[]> {
@@ -48,6 +50,6 @@ export class OrdersRepository {
     if (result.deletedCount === 0) {
       throw new NotFoundException('해당 주문이 존재하지 않습니다.');
     }
-    return { message: '주문이 삭제 되었습니다..' };
+    return { message: '주문이 삭제 되었습니다.' };
   }
 }

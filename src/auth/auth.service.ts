@@ -20,6 +20,7 @@ export class AuthService {
       userId: user._id,
       userNick: user?.nickname,
       userlevel: user.userlevel,
+      restaurantsId: user.restaurants_id,
       userToken: 'accessToken',
     };
 
