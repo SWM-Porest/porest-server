@@ -4,7 +4,7 @@ import { Order } from './schemas/orders.schema';
 import { InjectModel } from '@nestjs/mongoose';
 import { CreateOrdersDto } from './dto/createOrders.dto';
 import { UpdateOrdersDto } from './dto/updateOrders.dto';
-import { GetOrdersByUser } from './dto/getOrdersByUser.dto';
+import { GetOrdersByUserDto } from './dto/getOrdersByUser.dto';
 
 @Injectable()
 export class OrdersRepository {
@@ -30,7 +30,7 @@ export class OrdersRepository {
     throw new NotFoundException('해당 주문이 존재하지 않습니다.');
   }
 
-  async getOrdersByUser(id: string, page: number, pageSize: number, sort: number): Promise<GetOrdersByUser> {
+  async getOrdersByUser(id: string, page: number, pageSize: number, sort: number): Promise<GetOrdersByUserDto> {
     const startIndex = (page - 1) * pageSize;
     const endIndex = page * pageSize;
     const orders = await this.Order.find({ user_id: id })

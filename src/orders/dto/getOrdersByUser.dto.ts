@@ -2,7 +2,7 @@ import { IsNotEmpty } from 'class-validator';
 import { Order } from '../schemas/orders.schema';
 import { ApiProperty } from '@nestjs/swagger';
 
-export class GetOrdersByUser {
+export class GetOrdersByUserDto {
   @ApiProperty({ example: '[{order1}, {order2}]', description: '로그인한 유저가 주문한 내역', required: false })
   orders: Order[];
 

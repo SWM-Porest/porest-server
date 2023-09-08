@@ -17,7 +17,7 @@ import { Roles } from 'src/auth/decorator/roles.decorator';
 import { UserRole } from 'src/auth/schemas/user.schema';
 import { RolesGuard } from 'src/auth/guard/roles.guard';
 import { Order } from './schemas/orders.schema';
-import { GetOrdersByUser } from './dto/getOrdersByUser.dto';
+import { GetOrdersByUserDto } from './dto/getOrdersByUser.dto';
 
 @Controller('orders')
 @ApiTags('주문 API')
@@ -80,7 +80,7 @@ export class OrdersController {
     @Query('pageSize', ParseIntPipe) pageSize: number,
     @Query('sort', ParseIntPipe) sort: number,
     @Req() req: any,
-  ): Promise<GetOrdersByUser> {
+  ): Promise<GetOrdersByUserDto> {
     return await this.ordersService.getOrdersByUser(req.user.userId, page, pageSize, sort);
   }
 

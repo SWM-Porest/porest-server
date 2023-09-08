@@ -1,10 +1,7 @@
 import { ApiProperty } from '@nestjs/swagger';
 import { IsEmail, IsEnum, IsNotEmpty, IsNumber, IsOptional, IsString, MaxLength, MinLength } from 'class-validator';
-import { Types } from 'mongoose';
 
 export class RegistUserDTO {
-  _id: Types.ObjectId;
-
   @ApiProperty({ example: '123456', description: '카카오 고유 ID Number', required: false })
   @IsNumber()
   social_id: number;

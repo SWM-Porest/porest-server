@@ -8,7 +8,7 @@ import { CreateOrdersDto } from './dto/createOrders.dto';
 import { UsersService } from 'src/auth/user.service';
 import { AuthService } from 'src/auth/auth.service';
 import { UpdateOrdersDto } from './dto/updateOrders.dto';
-import { GetOrdersByUser } from './dto/getOrdersByUser.dto';
+import { GetOrdersByUserDto } from './dto/getOrdersByUser.dto';
 
 jest.mock('./orders.service.ts');
 
@@ -125,7 +125,7 @@ describe('OrdersController', () => {
 
   describe('GET /orders', () => {
     it('get orders By UserId', async () => {
-      const getOrders: GetOrdersByUser = {
+      const getOrders: GetOrdersByUserDto = {
         orders: [order],
         page: 1,
         pageSize: 10,

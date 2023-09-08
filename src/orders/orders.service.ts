@@ -5,7 +5,7 @@ import { UpdateOrdersDto } from './dto/updateOrders.dto';
 import { Order } from './schemas/orders.schema';
 import { Types, isValidObjectId } from 'mongoose';
 import { UsersService } from 'src/auth/user.service';
-import { GetOrdersByUser } from './dto/getOrdersByUser.dto';
+import { GetOrdersByUserDto } from './dto/getOrdersByUser.dto';
 
 @Injectable()
 export class OrdersService {
@@ -34,7 +34,7 @@ export class OrdersService {
     return 'getOrders';
   }
 
-  async getOrdersByUser(id: string, page: number, pageSize: number, sort: number): Promise<GetOrdersByUser> {
+  async getOrdersByUser(id: string, page: number, pageSize: number, sort: number): Promise<GetOrdersByUserDto> {
     return await this.ordersRepository.getOrdersByUser(id, page, pageSize, sort);
   }
 
@@ -49,6 +49,7 @@ export class OrdersService {
     throw new BadRequestException('해당 요청에 대한 권한이 없습니다.');
   }
 
+  // 유저가 해당 매장의 주문 접근 권한이 있는지 확인
   async validateRestaurant(user_id: string, restaurant_id: string) {
     const user = await this.usersService.findUserById(user_id);
     if (user.restaurants_id.includes(restaurant_id)) {
