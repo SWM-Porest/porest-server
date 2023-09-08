@@ -131,6 +131,7 @@ export class AuthController {
     return { success: true, access_token: `${req.cookies['access_token']}` };
   }
 
+  @ApiBearerAuth('access-token')
   @Roles(UserRole.USER)
   @UseGuards(JwtAuthGuard, RolesGuard)
   @Get('user')
