@@ -1,4 +1,4 @@
-import { Controller, UseGuards, Get, Post, Body, Res, Req, Param, Headers } from '@nestjs/common';
+import { Controller, UseGuards, Get, Post, Body, Res, Req, Headers } from '@nestjs/common';
 import { AuthService } from './auth.service';
 import { UsersService } from './user.service';
 import {
@@ -13,10 +13,10 @@ import { Response } from 'express';
 import { KakaoAuthGuard } from './guard/kakao-auth.guard';
 import { JwtAuthGuard } from './guard/jwt-auth.guard';
 import { JwtRefreshGuard } from './guard/jwt-refresh.guard';
-import { RegistUserDTO } from './dto/registUser.dto';
 import { Roles } from './decorator/roles.decorator';
 import { UserRole } from './schemas/user.schema';
 import { RolesGuard } from './guard/roles.guard';
+import { UpdateUserDto } from './dto/updateUser.dto';
 
 @ApiTags('auth')
 @Controller('auth')
@@ -76,7 +76,7 @@ export class AuthController {
   @Roles(UserRole.USER)
   @UseGuards(JwtAuthGuard, RolesGuard)
   @Post('login')
-  async registUser(@Req() req: any, @Body() RegistUserDTO: RegistUserDTO, @Res() res: Response) {
+  async registUser(@Req() req: any, @Res() res: Response) {
     try {
       console.log('req.user:', req.user);
       res.json({ success: true, message: 'login success' });
@@ -115,7 +115,7 @@ export class AuthController {
   @Roles(UserRole.USER)
   @UseGuards(JwtAuthGuard, RolesGuard)
   @Post('update')
-  async updateUser(@Req() req: any, @Body() registUserDto: RegistUserDTO) {
+  async updateUser(@Req() req: any, @Body() registUserDto: UpdateUserDto) {
     try {
       return await this.usersService.update(registUserDto, req.user.userId);
     } catch (error) {
@@ -129,5 +129,10 @@ export class AuthController {
   @Get('getToken')
   async getToken(@Req() req: any) {
     return { success: true, access_token: `${req.cookies['access_token']}` };
+  }
+
+  @Get('user')
+  async getUser(@Req() req: any) {
+    return this.usersService.findUserById(req.user.userId);
   }
 }
