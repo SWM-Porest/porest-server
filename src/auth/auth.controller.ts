@@ -131,6 +131,8 @@ export class AuthController {
     return { success: true, access_token: `${req.cookies['access_token']}` };
   }
 
+  @Roles(UserRole.USER)
+  @UseGuards(JwtAuthGuard, RolesGuard)
   @Get('user')
   async getUser(@Req() req: any) {
     return this.usersService.findUserById(req.user.userId);
