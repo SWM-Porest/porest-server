@@ -128,6 +128,6 @@ export class AuthController {
   @ApiBearerAuth('access-token')
   @Get('getToken')
   async getToken(@Req() req: any) {
-    return { success: true, access_token: `Bearer ${req.cookies['access_token']}` };
+    return { success: true, access_token: `${req.cookies['access_token']}` };
   }
 }
