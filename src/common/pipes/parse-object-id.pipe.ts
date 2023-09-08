@@ -7,6 +7,6 @@ export class ParseObjectIdPipe implements PipeTransform<string, Types.ObjectId> 
     if (!Types.ObjectId.isValid(value)) {
       throw new BadRequestException('Invalid ObjectId');
     }
-    return Types.ObjectId.createFromHexString(value);
+    return new Types.ObjectId(value);
   }
 }

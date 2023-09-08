@@ -1,7 +1,8 @@
-import { Injectable } from '@nestjs/common';
+import { Injectable, NotFoundException } from '@nestjs/common';
 import { User } from './schemas/user.schema';
 import { UsersRepository } from './user.repository';
 import { RegistUserDTO } from './dto/registUser.dto';
+import { UpdateUserDto } from './dto/updateUser.dto';
 
 @Injectable()
 export class UsersService {
@@ -23,7 +24,11 @@ export class UsersService {
     return await this.usersRepository.createUser(user);
   }
 
-  async update(user: RegistUserDTO, id: string): Promise<User> {
-    return await this.usersRepository.updateUser(user, id);
+  async update(userUpdated: UpdateUserDto, id: string): Promise<User> {
+    const user = await this.findUserById(id);
+    if (!user) {
+      throw new NotFoundException('해당 유저가 존재하지 않습니다.');
+    }
+    return await this.usersRepository.updateUser(userUpdated, id);
   }
 }
