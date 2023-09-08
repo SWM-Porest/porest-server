@@ -114,14 +114,20 @@ export class AuthController {
   })
   @Roles(UserRole.USER)
   @UseGuards(JwtAuthGuard, RolesGuard)
-  @Post('update/:id')
-  async updateUser(@Param('id') id: string, @Body() registUserDto: RegistUserDTO) {
+  @Post('update')
+  async updateUser(@Req() req: any, @Body() registUserDto: RegistUserDTO) {
     try {
-      return await this.usersService.update(registUserDto, id);
+      return await this.usersService.update(registUserDto, req.user.userId);
     } catch (error) {
       console.log(error);
     }
     // 그 외의 경우
     return false;
+  }
+
+  @ApiBearerAuth('access-token')
+  @Get('getToken')
+  async getToken(@Req() req: any) {
+    return { success: true, access_token: `Bearer ${req.cookies['access_token']}` };
   }
 }

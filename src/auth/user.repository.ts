@@ -26,8 +26,8 @@ export class UsersRepository {
   }
 
   async updateUser(user: RegistUserDTO, id: string) {
-    const objId = new Object(id);
+    const _id = new Types.ObjectId(id);
     const { ...updateField } = user;
-    return this.UserModel.findOneAndUpdate({ _id: objId }, { $set: updateField }, { new: true }).exec();
+    return this.UserModel.findOneAndUpdate({ _id }, { $set: updateField }, { new: true }).exec();
   }
 }

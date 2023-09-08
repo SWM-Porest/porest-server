@@ -34,7 +34,7 @@ export class OrdersRepository {
     const startIndex = (page - 1) * pageSize;
     const endIndex = page * pageSize;
     const orders = await this.Order.find({ user_id: id })
-      .sort({ created_at: sort ? 1 : -1 })
+      .sort({ stats: 1, created_at: sort ? 1 : -1 })
       .skip(startIndex)
       .limit(endIndex)
       .exec();
