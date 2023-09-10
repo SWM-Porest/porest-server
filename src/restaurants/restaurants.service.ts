@@ -1,6 +1,6 @@
 import { HttpException, HttpStatus, Injectable, NotFoundException } from '@nestjs/common';
 import { CreateMenuOptionsDto, CreateMenusDto, CreateRestaurantsDto } from './dto/create-restaurants.dto';
-import { UpdateMenusDto, UpdateRestaurantsDto } from './dto/update-restaurants.dto';
+import { UpdateMenuOptionsDto, UpdateMenusDto, UpdateRestaurantsDto } from './dto/update-restaurants.dto';
 import { Types } from 'mongoose';
 import { RestaurantRepository } from './restaurants.repository';
 import { Restaurant } from './schemas/restaurants.schema';
@@ -138,7 +138,7 @@ export class RestaurantsService {
     return await this.restaurantRepository.addMenuOption(_id, menuId, createMenuOptionsDto);
   }
 
-  async updateMenuOption(_id: string, menuId: string, updateMenuOptionDto: CreateMenuOptionsDto): Promise<Restaurant> {
+  async updateMenuOption(_id: string, menuId: string, updateMenuOptionDto: UpdateMenuOptionsDto): Promise<Restaurant> {
     const restaurant: Restaurant = await this.findOne(_id);
 
     if (!restaurant) {
