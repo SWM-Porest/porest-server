@@ -8,6 +8,7 @@ import * as Joi from 'joi';
 import { LoggerMiddleware } from './logger/logger.middleware';
 import { AuthModule } from './auth/auth.module';
 import { OrdersModule } from './orders/orders.module';
+import { TablesModule } from './tables/tables.module';
 
 @Module({
   imports: [
@@ -24,6 +25,7 @@ import { OrdersModule } from './orders/orders.module';
     MongooseModule.forRoot(process.env.MONGO_URI),
     AuthModule,
     OrdersModule,
+    TablesModule,
   ],
   controllers: [AppController],
   providers: [AppService],

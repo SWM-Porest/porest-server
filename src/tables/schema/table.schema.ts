@@ -9,6 +9,9 @@ export class Table {
   @Prop({ type: Types.ObjectId, required: true })
   restaurant_id: Types.ObjectId;
 
+  @Prop({ type: [Types.ObjectId], required: true })
+  order_ids: Types.ObjectId[];
+
   @Prop({ required: true })
   name: string;
 

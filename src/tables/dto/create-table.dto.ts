@@ -24,10 +24,17 @@ export class CreateTableDto {
   name: string;
 
   @ApiProperty({
+    description: '주문 IDs',
+    required: false,
+  })
+  order_ids: Types.ObjectId[];
+
+  @ApiProperty({
     description: '테이블 생성일',
     required: false,
   })
   created_at: Date;
+
   @ApiProperty({
     description: '테이블 수정일',
     required: false,
