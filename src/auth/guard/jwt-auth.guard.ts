@@ -60,15 +60,14 @@ export class JwtAuthGuard extends AuthGuard('jwt') {
           const access_token_user = await this.userService.findUserById(token_verify.userId);
           const new_token = await this.authService.createLoginToken(access_token_user);
           return {
-            user: access_token_user,
+            user: token_verify,
             new_token,
             tokenReissue: true,
           };
         } else {
-          // 로그인 토큰의남은 시간이 5분 이상일때
-          const user = await this.userService.findUserById(token_verify.userId);
+          // 로그인 토큰의남은 시간이 4일 이상일때
           return {
-            user,
+            user: token_verify,
             tokenReissue: false,
           };
         }
