@@ -43,8 +43,10 @@ describe('OrdersController', () => {
       _id: undefined,
       restaurant_id: '',
       restaurant_name: 'test',
+      restaurant_address: '',
       user_id: '',
       status: 1,
+      status_updated_at: undefined,
       table_id: 1,
       menus: JSON.parse('{"menu_id": "value"}'),
     };
@@ -55,6 +57,7 @@ describe('OrdersController', () => {
       _id: '60b6d1b0b9b3b1b4e8b8b0b1',
       menus: JSON.parse('{"menu_id": "value"}'),
       status: 1,
+      status_updated_at: undefined,
     };
   };
 

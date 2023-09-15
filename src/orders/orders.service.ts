@@ -12,11 +12,12 @@ export class OrdersService {
   constructor(private readonly ordersRepository: OrdersRepository, private readonly usersService: UsersService) {}
 
   async createOrder(createOrdersDto: CreateOrdersDto): Promise<Order> {
+    console.log('createOrdersDto: ', createOrdersDto);
     return await this.ordersRepository.createOrder(createOrdersDto);
   }
 
-  async updateOrder(updateOrdersDto: UpdateOrdersDto, id: Types.ObjectId): Promise<Order> {
-    return await this.ordersRepository.updateOrder(updateOrdersDto, id);
+  async updateOrder(updateOrdersDto: UpdateOrdersDto): Promise<Order> {
+    return await this.ordersRepository.updateOrder(updateOrdersDto);
   }
 
   async deleteOrder(_id: Types.ObjectId) {
@@ -39,7 +40,7 @@ export class OrdersService {
   }
 
   async getOrdersByRestaurant(id: string, status: number): Promise<Order[]> {
-    return await this.ordersRepository.getOrdersByRestaurant(new Types.ObjectId(id), status);
+    return await this.ordersRepository.getOrdersByRestaurant(id, status);
   }
 
   async validateUser(id: Types.ObjectId, user_id: Types.ObjectId) {
@@ -49,12 +50,12 @@ export class OrdersService {
     throw new BadRequestException('해당 요청에 대한 권한이 없습니다.');
   }
 
-  // 유저가 해당 매장의 주문 접근 권한이 있는지 확인
-  async validateRestaurant(user_id: string, restaurant_id: string) {
-    const user = await this.usersService.findUserById(user_id);
-    if (user.restaurants_id.includes(restaurant_id)) {
+  // 유저가 해당 주문의 접근 권한이 있는지 확인
+  async validateRestaurant(restaurant_id: string, restaurantsId: string[]) {
+    if (restaurantsId.includes(restaurant_id)) {
       return true;
     }
+    console.log('restaurantList에 해당 매장이 없음');
     throw new BadRequestException('해당 요청에 대한 권한이 없습니다.');
   }
 }

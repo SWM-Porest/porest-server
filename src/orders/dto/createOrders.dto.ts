@@ -1,7 +1,7 @@
 import { ApiProperty } from '@nestjs/swagger';
 import { IsNotEmpty } from 'class-validator';
 import { Schema, Types } from 'mongoose';
-import { OrderStatus } from '../schemas/orders.schema';
+import { OrderStatus, StatusUpdatedAt } from '../schemas/orders.schema';
 
 export class CreateOrdersDto {
   _id: Types.ObjectId;
@@ -14,9 +14,15 @@ export class CreateOrdersDto {
   @IsNotEmpty()
   restaurant_name: string;
 
+  @ApiProperty({ example: '서울시 강남구', description: '주문할 레스토랑의 address', required: true })
+  @IsNotEmpty()
+  restaurant_address: string;
+
   user_id: string;
 
   status: OrderStatus;
+
+  status_updated_at: StatusUpdatedAt;
 
   @ApiProperty({ example: 1, description: '주문할 테이블의 number', required: true })
   @IsNotEmpty()

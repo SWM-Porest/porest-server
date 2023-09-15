@@ -1,4 +1,17 @@
-import { Body, Controller, Delete, Get, Param, ParseIntPipe, Patch, Post, Query, Req, UseGuards } from '@nestjs/common';
+import {
+  Body,
+  Controller,
+  Delete,
+  Get,
+  NotAcceptableException,
+  Param,
+  ParseIntPipe,
+  Patch,
+  Post,
+  Query,
+  Req,
+  UseGuards,
+} from '@nestjs/common';
 import {
   ApiBearerAuth,
   ApiCreatedResponse,
@@ -37,7 +50,7 @@ export class OrdersController {
   })
   @Roles(UserRole.USER)
   @Post()
-  async createOrder(@Body() createOrdersDto: CreateOrdersDto, @Req() req: any) {
+  async createOrder(@Body() createOrdersDto: CreateOrdersDto, @Req() req: any): Promise<Order> {
     createOrdersDto.user_id = req.user.userId;
     const data = await this.ordersService.createOrder(createOrdersDto);
     return data;
@@ -52,9 +65,14 @@ export class OrdersController {
   @Roles(UserRole.RESTAURANT_MANAGER)
   @Patch()
   async updateOrder(@Req() req: any, @Body() updateOrdersDto: UpdateOrdersDto): Promise<Order> {
-    const objectId = new Types.ObjectId(updateOrdersDto._id);
-    await this.ordersService.validateRestaurant(req.user.userId, req.user.restaurantsId);
-    return await this.ordersService.updateOrder(updateOrdersDto, objectId);
+    await this.ordersService.validateRestaurant(updateOrdersDto._id, req.user.restaurantsId);
+    // try {
+    //   await this.ordersService.validateRestaurant(req.user.userId, req.user.restaurantsId);
+    // } catch (err) {
+    //   throw new NotAcceptableException('해당 요청에 대한 권한이 없습니다.');
+    // }
+
+    return await this.ordersService.updateOrder(updateOrdersDto);
   }
 
   @ApiOperation({ summary: '주문 삭제', description: '주문을 삭제하는 API입니다.' })
@@ -93,7 +111,8 @@ export class OrdersController {
   @Roles(UserRole.RESTAURANT_MANAGER)
   @Get('/restaurant/:id')
   async getOrdersByRestaurant(@Req() req: any, @Param('id') id: string, @Query('status', ParseIntPipe) status: number) {
-    await this.ordersService.validateRestaurant(req.user.userId, id);
+    console.log(id);
+    await this.ordersService.validateRestaurant(id, req.user.restaurantsId);
     return await this.ordersService.getOrdersByRestaurant(id, status);
   }
 
