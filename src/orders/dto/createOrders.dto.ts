@@ -1,7 +1,8 @@
 import { ApiProperty } from '@nestjs/swagger';
 import { IsNotEmpty } from 'class-validator';
 import { Schema, Types } from 'mongoose';
-import { OrderStatus, StatusUpdatedAt } from '../schemas/orders.schema';
+import { OrderMenu, OrderStatus, StatusUpdatedAt } from '../schemas/orders.schema';
+import { PushSubscriptionDto } from './pushSubscription.dto';
 
 export class CreateOrdersDto {
   _id: Types.ObjectId;
@@ -30,5 +31,12 @@ export class CreateOrdersDto {
 
   @ApiProperty({ example: '주문할 메뉴들', description: '주문할 메뉴들', required: true })
   @IsNotEmpty()
-  menus: Schema.Types.Mixed;
+  menus: OrderMenu;
+
+  @ApiProperty({
+    example: { endpoint: 'url', keys: { auth: 'string', p256dh: 'string' }, expirationTime: null },
+    description: '유저의 푸시 알림 구독 정보',
+    required: false,
+  })
+  token?: PushSubscriptionDto = null;
 }

@@ -3,22 +3,34 @@ import { HydratedDocument, Schema as mSchema, Types } from 'mongoose';
 
 export type OrderDocument = HydratedDocument<Order>;
 
-@Schema()
 export class StatusUpdatedAt {
-  @Prop()
-  1: Date;
+  [key: number]: Date;
+}
 
-  @Prop()
-  2: Date;
+class Keys {
+  auth: string;
 
-  @Prop()
-  3: Date;
+  p256dh: string;
+}
 
-  @Prop()
-  4: Date;
+export class PushSubscription {
+  endpoint: string;
 
-  @Prop()
-  5: Date;
+  keys: Keys;
+
+  expirationTime: number | null;
+}
+
+export class OrderMenudetail {
+  menu_name: string;
+  price: number;
+  quantity: number;
+  img: string;
+  // 옵션 추가해야됨.
+}
+
+export class OrderMenu {
+  [key: string]: OrderMenudetail;
 }
 
 @Schema()
@@ -38,7 +50,7 @@ export class Order {
   user_id: string;
 
   @Prop({ required: true })
-  menus: mSchema.Types.Mixed;
+  menus: OrderMenu;
 
   @Prop({ required: true, default: 1 })
   status: number;
@@ -57,6 +69,9 @@ export class Order {
 
   @Prop()
   updated_at: Date;
+
+  @Prop()
+  token: PushSubscription;
 }
 export const OrderSchema = SchemaFactory.createForClass(Order);
 
