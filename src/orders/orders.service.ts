@@ -6,14 +6,16 @@ import { Order } from './schemas/orders.schema';
 import { Types, isValidObjectId } from 'mongoose';
 import { UsersService } from 'src/auth/user.service';
 import { GetOrdersByUserDto } from './dto/getOrdersByUser.dto';
+import { sendNotification } from 'web-push';
+import { OrderStatusMessage, PushSubscriptionDto } from './dto/pushSubscription.dto';
 
 @Injectable()
 export class OrdersService {
   constructor(private readonly ordersRepository: OrdersRepository, private readonly usersService: UsersService) {}
 
   async createOrder(createOrdersDto: CreateOrdersDto): Promise<Order> {
-    console.log('createOrdersDto: ', createOrdersDto);
-    return await this.ordersRepository.createOrder(createOrdersDto);
+    const order = await this.ordersRepository.createOrder(createOrdersDto);
+    return order;
   }
 
   async updateOrder(updateOrdersDto: UpdateOrdersDto): Promise<Order> {
@@ -57,5 +59,36 @@ export class OrdersService {
     }
     console.log('restaurantList에 해당 매장이 없음');
     throw new BadRequestException('해당 요청에 대한 권한이 없습니다.');
+  }
+
+  async notifyCreateOrder(token: PushSubscriptionDto) {
+    // payload는 인자로 받아서 처리해야함, 현재는 테스트용
+    const testPayload = JSON.stringify({
+      title: `주문이 접수 되었습니다.`,
+      badge: 'https://pocketrestaurant.net/favicon.ico',
+      body: 'Notification Body',
+      tag: 'Notification Tag',
+      requireInteraction: true,
+    });
+
+    try {
+      const result = await sendNotification(token, testPayload);
+    } catch (error) {
+      console.log(error);
+    }
+  }
+
+  async notifyUpdateOrder(token: PushSubscriptionDto, status: number) {
+    const payload = JSON.stringify({
+      title: `주문의 상태가 변경되었습니다.`,
+      body: `${status as OrderStatusMessage}`,
+      tag: 'Notification Tag',
+      requireInteraction: true,
+    });
+    try {
+      const result = await sendNotification(token, payload);
+    } catch (error) {
+      console.log(error);
+    }
   }
 }

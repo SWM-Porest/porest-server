@@ -33,6 +33,7 @@
     "@types/cookie-parser": "^1.4.4",
     "@types/passport-kakao": "^1.0.0",
     "@types/passport-local": "^1.0.35",
+    "@types/web-push": "^3.6.0",
     "aws-sdk": "^2.1423.0",
     "axios": "^1.4.0",
     "bcryptjs": "^2.4.3",
@@ -53,6 +54,7 @@
     "reflect-metadata": "^0.1.13",
     "rxjs": "^7.8.1",
     "swagger-ui-express": "^5.0.0",
+    "web-push": "^3.6.6",
     "winston": "^3.10.0"
   },
   "devDependencies": {

@@ -1,17 +1,4 @@
-import {
-  Body,
-  Controller,
-  Delete,
-  Get,
-  NotAcceptableException,
-  Param,
-  ParseIntPipe,
-  Patch,
-  Post,
-  Query,
-  Req,
-  UseGuards,
-} from '@nestjs/common';
+import { Body, Controller, Delete, Get, Param, ParseIntPipe, Patch, Post, Query, Req, UseGuards } from '@nestjs/common';
 import {
   ApiBearerAuth,
   ApiCreatedResponse,
@@ -31,6 +18,8 @@ import { UserRole } from 'src/auth/schemas/user.schema';
 import { RolesGuard } from 'src/auth/guard/roles.guard';
 import { Order } from './schemas/orders.schema';
 import { GetOrdersByUserDto } from './dto/getOrdersByUser.dto';
+import { sendNotification } from 'web-push';
+import { PushSubscriptionDto } from './dto/pushSubscription.dto';
 
 @Controller('orders')
 @ApiTags('주문 API')
@@ -41,7 +30,7 @@ export class OrdersController {
 
   @ApiOperation({
     summary: '주문 생성',
-    description: '주문을 생성하는 API입니다. Headers = Authorization: Bearer ${token} ',
+    description: '주문을 생성하는 API입니다. Headers = Authorization: Bearer ${access_token}',
   })
   @ApiCreatedResponse({ description: '주문 생성 성공', type: Order })
   @ApiForbiddenResponse({
@@ -52,7 +41,11 @@ export class OrdersController {
   @Post()
   async createOrder(@Body() createOrdersDto: CreateOrdersDto, @Req() req: any): Promise<Order> {
     createOrdersDto.user_id = req.user.userId;
+    const token = createOrdersDto?.token;
     const data = await this.ordersService.createOrder(createOrdersDto);
+    if (token) {
+      await this.ordersService.notifyCreateOrder(token);
+    }
     return data;
   }
 
@@ -65,14 +58,16 @@ export class OrdersController {
   @Roles(UserRole.RESTAURANT_MANAGER)
   @Patch()
   async updateOrder(@Req() req: any, @Body() updateOrdersDto: UpdateOrdersDto): Promise<Order> {
-    await this.ordersService.validateRestaurant(updateOrdersDto._id, req.user.restaurantsId);
-    // try {
-    //   await this.ordersService.validateRestaurant(req.user.userId, req.user.restaurantsId);
-    // } catch (err) {
-    //   throw new NotAcceptableException('해당 요청에 대한 권한이 없습니다.');
-    // }
+    const order = await this.ordersService.getOrder(new Types.ObjectId(updateOrdersDto._id));
+    await this.ordersService.validateRestaurant(order.restaurant_id, req.user.restaurantsId); // 해당 주문의 매장 관리 권한 확인
 
-    return await this.ordersService.updateOrder(updateOrdersDto);
+    const updatedOrder = await this.ordersService.updateOrder(updateOrdersDto);
+
+    // 주문 상태가 변경되었을 때, 푸시 알림 전송
+    if (updateOrdersDto?.status && updatedOrder?.token) {
+      await this.ordersService.notifyUpdateOrder(updatedOrder.token, updatedOrder.status);
+    }
+    return updatedOrder;
   }
 
   @ApiOperation({ summary: '주문 삭제', description: '주문을 삭제하는 API입니다.' })
@@ -111,9 +106,19 @@ export class OrdersController {
   @Roles(UserRole.RESTAURANT_MANAGER)
   @Get('/restaurant/:id')
   async getOrdersByRestaurant(@Req() req: any, @Param('id') id: string, @Query('status', ParseIntPipe) status: number) {
-    console.log(id);
     await this.ordersService.validateRestaurant(id, req.user.restaurantsId);
     return await this.ordersService.getOrdersByRestaurant(id, status);
+  }
+
+  @Post('testNotify')
+  async testNotify(@Body() Body: PushSubscriptionDto) {
+    const payload = JSON.stringify({
+      title: `테스트용 푸시 알림입니다.`,
+      Body: '테스트용 푸시 알림입니다.',
+      tag: '테스트용 푸시 알림입니다.',
+      requireInteraction: true,
+    });
+    await sendNotification(Body, payload);
   }
 
   @ApiOperation({ summary: '고객 주문 상태 조회', description: '주문을 조회하는 API입니다.' })
