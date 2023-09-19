@@ -37,7 +37,7 @@ export class ImageUploadService {
 
       return {
         filename: savedFilename,
-        path: process.env.UPLOAD_PATH + upload_type + savedFilename,
+        path: upload_type + savedFilename,
         type: file.mimetype,
       };
     });
@@ -71,7 +71,7 @@ export class ImageUploadService {
 
         return {
           filename: savedFilename,
-          path: process.env.AWS_UPLOAD_PATH + upload_type + savedFilename,
+          path: upload_type + savedFilename,
           type: file.mimetype,
         };
       }),

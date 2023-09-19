@@ -14,10 +14,14 @@ export class RestaurantsService {
     private readonly imageUploadService: ImageUploadService,
   ) {}
 
+  async isExistRestaurant(id: string): Promise<boolean> {
+    return await this.restaurantRepository.isExistRestaurant(id);
+  }
+
   async createRestaurant(createRestaurantsDto: CreateRestaurantsDto, files: Express.Multer.File[]) {
     const { name } = createRestaurantsDto;
 
-    if (await this.restaurantRepository.isExistRestaurant(name)) {
+    if (await this.restaurantRepository.isExistRestaurantName(name)) {
       throw new HttpException('Name is Duplicated', HttpStatus.CONFLICT);
     }
 

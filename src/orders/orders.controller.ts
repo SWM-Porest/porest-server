@@ -18,6 +18,7 @@ import { UserRole } from 'src/auth/schemas/user.schema';
 import { RolesGuard } from 'src/auth/guard/roles.guard';
 import { Order } from './schemas/orders.schema';
 import { GetOrdersByUserDto } from './dto/getOrdersByUser.dto';
+import { IsOptional } from 'class-validator';
 
 @Controller('orders')
 @ApiTags('주문 API')
@@ -57,6 +58,22 @@ export class OrdersController {
     return await this.ordersService.updateOrder(updateOrdersDto, objectId);
   }
 
+  // test code 필요
+  @ApiOperation({
+    summary: '주문 상태 수정',
+    description: '주문 상태를 수정하는 API입니다. 점주는 주문 상태를 수정할 수 있습니다. 고객은 수정이 불가함. ',
+  })
+  @ApiCreatedResponse({
+    description: '주문 상태 수정',
+    type: Order,
+  })
+  @Roles(UserRole.RESTAURANT_MANAGER)
+  @Patch(':id')
+  async updateOrderStatus(@Param('id') id: string, @Query('s') s: number): Promise<Order> {
+    const objectId = new Types.ObjectId(id);
+    return await this.ordersService.updateOrderStatus(objectId, s);
+  }
+
   @ApiOperation({ summary: '주문 삭제', description: '주문을 삭제하는 API입니다.' })
   @ApiCreatedResponse({ description: '주문 삭제 성공' })
   @Roles(UserRole.RESTAURANT_MANAGER)
@@ -92,9 +109,13 @@ export class OrdersController {
   })
   @Roles(UserRole.RESTAURANT_MANAGER)
   @Get('/restaurant/:id')
-  async getOrdersByRestaurant(@Req() req: any, @Param('id') id: string, @Query('status', ParseIntPipe) status: number) {
+  async getOrdersByRestaurant(
+    @Req() req: any,
+    @Param('id') id: string,
+    @Query('status') status: number | null = null,
+  ): Promise<Order[]> {
     await this.ordersService.validateRestaurant(req.user.userId, id);
-    return await this.ordersService.getOrdersByRestaurant(id, status);
+    return await this.ordersService.getRestauarntOrdersByDate(id, status);
   }
 
   @ApiOperation({ summary: '고객 주문 상태 조회', description: '주문을 조회하는 API입니다.' })

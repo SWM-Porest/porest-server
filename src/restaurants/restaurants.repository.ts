@@ -28,7 +28,11 @@ export class RestaurantRepository {
     return await this.restaurantModel.create(restaurant);
   }
 
-  async isExistRestaurant(name: string): Promise<boolean> {
+  async isExistRestaurant(id: string): Promise<boolean> {
+    return (await this.restaurantModel.exists({ _id: new Types.ObjectId(id) })) ? true : false;
+  }
+
+  async isExistRestaurantName(name: string): Promise<boolean> {
     return (await this.restaurantModel.exists({ name })) ? true : false;
   }
   async updateRestaurant(_id: string, updateRestaurantsDto: UpdateRestaurantsDto): Promise<Restaurant> {
