@@ -40,22 +40,35 @@ describe('RestaurantsController', () => {
     return restaurant;
   };
 
-  const RestaurantDtoStub = (): CreateRestaurantsDto => {
-    return {
-      _id: undefined,
-      name: 'test',
-      address: 'test',
-      phone_number: 'test',
-      category: ['test'],
-      intro: 'test',
-      notice: 'test',
-      banner_images: [],
-      created_at: undefined,
-      en_name: undefined,
-      updated_at: undefined,
-      status: undefined,
-      menus: [],
-    };
+  const RestaurantDtoStub = {
+    _id: undefined,
+    name: 'test',
+    address: 'test',
+    phone_number: 'test',
+    category: ['test'],
+    intro: 'test',
+    notice: 'test',
+    banner_images: [],
+    created_at: undefined,
+    en_name: undefined,
+    updated_at: undefined,
+    status: undefined,
+    menus: [],
+    toSchema: () => {
+      const restaurant = new Restaurant();
+      restaurant._id = RestaurantDtoStub._id;
+      restaurant.name = RestaurantDtoStub.name;
+      restaurant.address = RestaurantDtoStub.address;
+      restaurant.phone_number = RestaurantDtoStub.phone_number;
+      restaurant.category = RestaurantDtoStub.category;
+      restaurant.intro = RestaurantDtoStub.intro;
+      restaurant.notice = RestaurantDtoStub.notice;
+      restaurant.banner_images = RestaurantDtoStub.banner_images;
+      restaurant.en_name = RestaurantDtoStub.en_name;
+      restaurant.status = RestaurantDtoStub.status;
+      restaurant.menus = RestaurantDtoStub.menus;
+      return restaurant;
+    },
   };
 
   beforeAll(async () => {
@@ -74,7 +87,7 @@ describe('RestaurantsController', () => {
       jest.spyOn(service, 'createRestaurant').mockImplementation(() => Promise.resolve(restaurant));
       const received = await controller.createRestaurant(
         {
-          createRestaurantsDto: JSON.stringify(RestaurantDtoStub()),
+          createRestaurantsDto: JSON.stringify(RestaurantDtoStub),
         },
         undefined,
       );
@@ -90,7 +103,7 @@ describe('RestaurantsController', () => {
       await expect(
         controller.createRestaurant(
           {
-            createRestaurantsDto: JSON.stringify(RestaurantDtoStub()),
+            createRestaurantsDto: JSON.stringify(RestaurantDtoStub),
           },
           undefined,
         ),
@@ -118,16 +131,16 @@ describe('RestaurantsController', () => {
 
   describe('PATCH /restaurants/:id', () => {
     it('update restaurant', async () => {
-      jest.spyOn(service, 'update').mockImplementation(() => Promise.resolve(dtoToSchema(RestaurantDtoStub())));
+      jest.spyOn(service, 'update').mockImplementation(() => Promise.resolve(dtoToSchema(RestaurantDtoStub)));
       const received = await controller.updateRestaurant(
         restaurant._id.toString(),
         {
-          updateRestaurantsDto: JSON.stringify(dtoToSchema(RestaurantDtoStub())),
+          updateRestaurantsDto: JSON.stringify(dtoToSchema(RestaurantDtoStub)),
         },
         undefined,
       );
 
-      expect(received).toEqual(dtoToSchema(RestaurantDtoStub()));
+      expect(received).toEqual(dtoToSchema(RestaurantDtoStub));
     });
   });
 
