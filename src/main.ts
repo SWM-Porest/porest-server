@@ -1,7 +1,10 @@
 import { NestFactory } from '@nestjs/core';
 import { AppModule } from './app.module';
-import { DocumentBuilder, SwaggerModule } from '@nestjs/swagger';
+import { DocumentBuilder, SwaggerCustomOptions, SwaggerModule } from '@nestjs/swagger';
 import { NestExpressApplication } from '@nestjs/platform-express';
+import { ValidationPipe } from '@nestjs/common';
+import * as cookieParser from 'cookie-parser';
+import { setVapidDetails } from 'web-push';
 
 async function bootstrap() {
   if (process.on) {
@@ -23,14 +26,27 @@ async function bootstrap() {
     credentials: true,
   });
 
+  app.useGlobalPipes(new ValidationPipe({ transform: true }));
+  app.use(cookieParser());
+
   const config = new DocumentBuilder()
     .setTitle('PocketRestaurant API')
     .setDescription('PocketRestaurant API description')
     .setVersion('1.0')
     .addTag('pocekrestaurant')
+    .addApiKey({ type: 'http', scheme: 'bearer', name: 'authorization', in: 'header' }, 'access-token')
     .build();
+
+  const swaggerOptions: SwaggerCustomOptions = {
+    swaggerOptions: {
+      persistAuthorization: true,
+    },
+  };
+
   const document = SwaggerModule.createDocument(app, config);
-  SwaggerModule.setup('api', app, document);
+  SwaggerModule.setup('api', app, document, swaggerOptions);
+
+  setVapidDetails('https://pocketrestaurant.net', process.env.VAPID_PUBLIC_KEY, process.env.VAPID_PRIVATE_KEY);
 
   await app.listen(process.env.PORT, () => {
     if (process.send) {

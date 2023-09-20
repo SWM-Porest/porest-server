@@ -2,18 +2,14 @@ import { Injectable } from '@nestjs/common';
 import { JwtService } from '@nestjs/jwt';
 import { User } from './schemas/user.schema';
 import { UsersService } from './user.service';
-import { AuthRepository } from './auth.repository';
+import { Types } from 'mongoose';
 
 @Injectable()
 export class AuthService {
-  constructor(
-    private usersService: UsersService,
-    private jwtService: JwtService,
-    private authRepository: AuthRepository,
-  ) {}
+  constructor(private usersService: UsersService, private jwtService: JwtService) {}
 
-  async validateUser(user_id: number): Promise<any> {
-    const user = await this.usersService.findUserById(user_id);
+  async validateKakaoUser(user_id: number): Promise<any> {
+    const user = await this.usersService.findUserByKakaoId(user_id);
     if (!user) {
       return null;
     }
@@ -22,22 +18,11 @@ export class AuthService {
 
   async createLoginToken(user: User) {
     const payload = {
-      user_id: user.id,
-      user_nick: user?.nickname,
-      user_level: user.userlevel,
-      user_token: 'accessToken',
-    };
-
-    return this.jwtService.sign(payload, {
-      secret: process.env.JWT_SECRET,
-      expiresIn: '1d',
-    });
-  }
-
-  async createRefreshToken(user: User): Promise<string> {
-    const payload = {
-      user_id: user.id,
-      user_token: 'refreshToken',
+      userId: user._id.toString(),
+      userNick: user?.nickname,
+      userlevel: user.userlevel,
+      restaurantsId: user.restaurants_id,
+      userToken: 'accessToken',
     };
 
     return this.jwtService.sign(payload, {
@@ -46,11 +31,23 @@ export class AuthService {
     });
   }
 
+  async createRefreshToken(user: User): Promise<string> {
+    const payload = {
+      userId: user._id,
+      userToken: 'refreshToken',
+    };
+
+    return this.jwtService.sign(payload, {
+      secret: process.env.JWT_SECRET,
+      expiresIn: '30d',
+    });
+  }
+
   onceToken(user_profile: any) {
     const payload = {
-      user_email: user_profile.user_email,
-      user_nick: user_profile.user_nick,
-      user_token: 'onceToken',
+      userEmail: user_profile.user_email,
+      userNick: user_profile.user_nick,
+      userToken: 'onceToken',
     };
 
     return this.jwtService.sign(payload, {

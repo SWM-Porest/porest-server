@@ -30,13 +30,16 @@
     "@nestjs/platform-express": "^10.0.0",
     "@nestjs/swagger": "^7.1.4",
     "@types/bcryptjs": "^2.4.2",
+    "@types/cookie-parser": "^1.4.4",
     "@types/passport-kakao": "^1.0.0",
     "@types/passport-local": "^1.0.35",
+    "@types/web-push": "^3.6.0",
     "aws-sdk": "^2.1423.0",
     "axios": "^1.4.0",
     "bcryptjs": "^2.4.3",
     "class-transformer": "^0.5.1",
     "class-validator": "^0.14.0",
+    "cookie-parser": "^1.4.6",
     "crypto-js": "^4.1.1",
     "joi": "^17.9.2",
     "moment": "^2.29.4",
@@ -51,6 +54,7 @@
     "reflect-metadata": "^0.1.13",
     "rxjs": "^7.8.1",
     "swagger-ui-express": "^5.0.0",
+    "web-push": "^3.6.6",
     "winston": "^3.10.0"
   },
   "devDependencies": {
@@ -85,6 +89,9 @@
     "typescript": "^5.1.3"
   },
   "jest": {
+    "moduleNameMapper": {
+      "^src/(.*)$": "<rootDir>/$1"
+    },
     "moduleFileExtensions": [
       "js",
       "json",

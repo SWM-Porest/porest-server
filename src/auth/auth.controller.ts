@@ -1,4 +1,4 @@
-import { Controller, UseGuards, Get, Post, Body, Res, Req } from '@nestjs/common';
+import { Controller, UseGuards, Get, Post, Body, Res, Req, Headers } from '@nestjs/common';
 import { AuthService } from './auth.service';
 import { UsersService } from './user.service';
 import {
@@ -13,10 +13,10 @@ import { Response } from 'express';
 import { KakaoAuthGuard } from './guard/kakao-auth.guard';
 import { JwtAuthGuard } from './guard/jwt-auth.guard';
 import { JwtRefreshGuard } from './guard/jwt-refresh.guard';
-import { RegistUserDTO } from './dto/registUser.dto';
 import { Roles } from './decorator/roles.decorator';
 import { UserRole } from './schemas/user.schema';
 import { RolesGuard } from './guard/roles.guard';
+import { UpdateUserDto } from './dto/updateUser.dto';
 
 @ApiTags('auth')
 @Controller('auth')
@@ -42,16 +42,17 @@ export class AuthController {
   })
   @UseGuards(KakaoAuthGuard)
   @Get('kakao/callback')
-  async kakaocallback(@Req() req, @Res() res: Response) {
+  async kakaocallback(@Req() req, @Res() res: Response, @Headers('Referer') referer: string) {
     if (req.user.type === 'login') {
-      res.cookie('access_token', req.user.access_token, { expires: new Date(Date.now() + 1000 * 60 * 60 * 24) });
+      res.cookie('access_token', req.user.access_token, { expires: new Date(Date.now() + 1000 * 60 * 60 * 24 * 30) });
       res.cookie('refresh_token', req.user.refresh_token, {
-        expires: new Date(Date.now() + 1000 * 60 * 60 * 24 * 7),
+        expires: new Date(Date.now() + 1000 * 60 * 60 * 24 * 30),
         httpOnly: true,
         secure: true,
       });
     }
-    res.redirect(process.env.LOGIN_REDIRECT_URL);
+
+    res.redirect(referer);
     res.end();
   }
 
@@ -72,10 +73,10 @@ export class AuthController {
     status: 401,
     description: '토큰 에러',
   })
-  @UseGuards(JwtAuthGuard, RolesGuard)
   @Roles(UserRole.USER)
+  @UseGuards(JwtAuthGuard, RolesGuard)
   @Post('login')
-  async registUser(@Req() req: any, @Body() RegistUserDTO: RegistUserDTO, @Res() res: Response) {
+  async registUser(@Req() req: any, @Res() res: Response) {
     try {
       console.log('req.user:', req.user);
       res.json({ success: true, message: 'login success' });
@@ -87,6 +88,7 @@ export class AuthController {
   }
 
   // 리프레쉬 토큰을 이용한 엑세스 토큰 재발급하기
+  @ApiBearerAuth('refresh-token')
   @UseGuards(JwtRefreshGuard)
   @Get('refresh-accesstoken')
   async refreshAccessToken() {
@@ -111,16 +113,29 @@ export class AuthController {
     description: '토큰 에러',
   })
   @Roles(UserRole.USER)
-  @UseGuards(JwtAuthGuard)
-  @UseGuards(RolesGuard)
+  @UseGuards(JwtAuthGuard, RolesGuard)
   @Post('update')
-  async updateUser(@Req() req: any, @Body() registUserDto: RegistUserDTO) {
+  async updateUser(@Req() req: any, @Body() registUserDto: UpdateUserDto) {
     try {
-      return await this.usersService.update(registUserDto);
+      return await this.usersService.update(registUserDto, req.user.userId);
     } catch (error) {
       console.log(error);
     }
     // 그 외의 경우
     return false;
+  }
+
+  @ApiBearerAuth('access-token')
+  @Get('getToken')
+  async getToken(@Req() req: any) {
+    return { success: true, access_token: `${req.cookies['access_token']}` };
+  }
+
+  @ApiBearerAuth('access-token')
+  @Roles(UserRole.USER)
+  @UseGuards(JwtAuthGuard, RolesGuard)
+  @Get('user')
+  async getUser(@Req() req: any) {
+    return this.usersService.findUserById(req.user.userId);
   }
 }

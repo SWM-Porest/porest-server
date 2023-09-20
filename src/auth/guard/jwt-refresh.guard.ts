@@ -23,7 +23,7 @@ export class JwtRefreshGuard extends AuthGuard('jwt') {
     const refreshTokenValidate = await this.validate(refreshToken);
 
     response.cookie('access_token', refreshTokenValidate, {
-      expires: new Date(Date.now() + 1000 * 60 * 60 * 24),
+      expires: new Date(Date.now() + 1000 * 60 * 60 * 24 * 7),
     });
     response.setHeader('access_token', refreshTokenValidate);
     response.setHeader('tokenReissue', true);
@@ -35,8 +35,7 @@ export class JwtRefreshGuard extends AuthGuard('jwt') {
     try {
       const token_verify = await this.authService.tokenValidate(refreshToken);
 
-      const user = await this.userService.findUserById(token_verify.user_id);
-      console.log('i am here: ', user);
+      const user = await this.userService.findUserById(token_verify.userId);
       return await this.authService.createLoginToken(user);
     } catch (error) {
       switch (error.message) {
