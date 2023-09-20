@@ -11,12 +11,8 @@ export class CreateOrdersDto {
   @IsNotEmpty()
   restaurant_id: string;
 
-  @ApiProperty({ example: '흑다돈', description: '주문할 레스토랑의 name', required: true })
-  @IsNotEmpty()
   restaurant_name: string;
 
-  @ApiProperty({ example: '서울시 강남구', description: '주문할 레스토랑의 address', required: true })
-  @IsNotEmpty()
   restaurant_address: string;
 
   user_id: string;

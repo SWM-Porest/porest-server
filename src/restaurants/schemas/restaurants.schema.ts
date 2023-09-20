@@ -1,5 +1,5 @@
 import { Prop, Schema, SchemaFactory } from '@nestjs/mongoose';
-import { Date, HydratedDocument } from 'mongoose';
+import { Date, HydratedDocument, Types } from 'mongoose';
 
 export type RestaurantsDocument = HydratedDocument<Restaurant>;
 
@@ -69,6 +69,8 @@ export const MenusSchema = SchemaFactory.createForClass(Menu);
 
 @Schema()
 export class Restaurant {
+  _id: Types.ObjectId;
+
   @Prop({ required: true, index: true })
   name: string;
 

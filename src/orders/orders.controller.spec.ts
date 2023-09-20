@@ -10,7 +10,7 @@ import { AuthService } from 'src/auth/auth.service';
 import { UpdateOrdersDto } from './dto/updateOrders.dto';
 import { GetOrdersByUserDto } from './dto/getOrdersByUser.dto';
 
-jest.mock('./orders.service.ts');
+jest.mock('./orders.service');
 
 describe('OrdersController', () => {
   let ordersController: OrdersController;
@@ -102,6 +102,7 @@ describe('OrdersController', () => {
 
   describe('PATCH /orders', () => {
     it('update order', async () => {
+      jest.spyOn(ordersService, 'getOrder').mockResolvedValue(order);
       jest.spyOn(ordersService, 'updateOrder').mockImplementation(() => Promise.resolve(order));
       const request = {
         user: {

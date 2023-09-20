@@ -8,12 +8,21 @@ import { UsersService } from 'src/auth/user.service';
 import { GetOrdersByUserDto } from './dto/getOrdersByUser.dto';
 import { sendNotification } from 'web-push';
 import { OrderStatusMessage, PushSubscriptionDto } from './dto/pushSubscription.dto';
+import { RestaurantsService } from 'src/restaurants/restaurants.service';
 
 @Injectable()
 export class OrdersService {
-  constructor(private readonly ordersRepository: OrdersRepository, private readonly usersService: UsersService) {}
+  constructor(
+    private readonly ordersRepository: OrdersRepository,
+    private readonly usersService: UsersService,
+    private readonly restaurantsService: RestaurantsService,
+  ) {}
 
   async createOrder(createOrdersDto: CreateOrdersDto): Promise<Order> {
+    const restaurant = await this.restaurantsService.findOne(createOrdersDto.restaurant_id);
+    createOrdersDto.restaurant_id = restaurant._id.toString();
+    createOrdersDto.restaurant_name = restaurant.name;
+    createOrdersDto.restaurant_address = restaurant.address;
     const order = await this.ordersRepository.createOrder(createOrdersDto);
     return order;
   }

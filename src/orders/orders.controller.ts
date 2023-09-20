@@ -118,7 +118,11 @@ export class OrdersController {
       tag: '테스트용 푸시 알림입니다.',
       requireInteraction: true,
     });
-    await sendNotification(Body, payload);
+    try {
+      await sendNotification(Body, payload);
+    } catch (err) {
+      console.log(err);
+    }
   }
 
   @ApiOperation({ summary: '고객 주문 상태 조회', description: '주문을 조회하는 API입니다.' })
