@@ -2,6 +2,7 @@ import { Injectable } from '@nestjs/common';
 import { JwtService } from '@nestjs/jwt';
 import { User } from './schemas/user.schema';
 import { UsersService } from './user.service';
+import { Types } from 'mongoose';
 
 @Injectable()
 export class AuthService {
@@ -17,7 +18,7 @@ export class AuthService {
 
   async createLoginToken(user: User) {
     const payload = {
-      userId: user._id,
+      userId: user._id.toString(),
       userNick: user?.nickname,
       userlevel: user.userlevel,
       restaurantsId: user.restaurants_id,
@@ -26,7 +27,7 @@ export class AuthService {
 
     return this.jwtService.sign(payload, {
       secret: process.env.JWT_SECRET,
-      expiresIn: '1d',
+      expiresIn: '7d',
     });
   }
 
@@ -38,7 +39,7 @@ export class AuthService {
 
     return this.jwtService.sign(payload, {
       secret: process.env.JWT_SECRET,
-      expiresIn: '7d',
+      expiresIn: '30d',
     });
   }
 

@@ -14,12 +14,19 @@ export class OrdersRepository {
     return await this.Order.create(createOrdersDto);
   }
 
-  async updateOrder(updateOrdersDto: UpdateOrdersDto, id: Types.ObjectId): Promise<Order> {
-    const isupdated = (await this.Order.updateOne({ _id: id }, updateOrdersDto)).acknowledged;
+  async updateOrder(updateOrdersDto: UpdateOrdersDto): Promise<Order> {
+    const _id = new Types.ObjectId(updateOrdersDto._id);
+    const status = updateOrdersDto.status;
+    const order = await this.getOrder(_id);
+    order.status_updated_at[status] = new Date();
+
+    const isupdated = (
+      await this.Order.updateOne({ _id }, { status_updated_at: { ...order.status_updated_at }, ...updateOrdersDto })
+    ).acknowledged;
     if (!isupdated) {
       throw new BadRequestException('주문 수정에 실패했습니다.');
     }
-    return this.getOrder(id);
+    return this.getOrder(_id);
   }
 
   async updateOrderStatus(id: Types.ObjectId, status: number): Promise<Order> {

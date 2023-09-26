@@ -44,9 +44,9 @@ export class AuthController {
   @Get('kakao/callback')
   async kakaocallback(@Req() req, @Res() res: Response, @Headers('Referer') referer: string) {
     if (req.user.type === 'login') {
-      res.cookie('access_token', req.user.access_token, { expires: new Date(Date.now() + 1000 * 60 * 60 * 24) });
+      res.cookie('access_token', req.user.access_token, { expires: new Date(Date.now() + 1000 * 60 * 60 * 24 * 30) });
       res.cookie('refresh_token', req.user.refresh_token, {
-        expires: new Date(Date.now() + 1000 * 60 * 60 * 24 * 7),
+        expires: new Date(Date.now() + 1000 * 60 * 60 * 24 * 30),
         httpOnly: true,
         secure: true,
       });

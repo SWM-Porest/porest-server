@@ -18,7 +18,8 @@ import { UserRole } from 'src/auth/schemas/user.schema';
 import { RolesGuard } from 'src/auth/guard/roles.guard';
 import { Order } from './schemas/orders.schema';
 import { GetOrdersByUserDto } from './dto/getOrdersByUser.dto';
-import { IsOptional } from 'class-validator';
+import { sendNotification } from 'web-push';
+import { PushSubscriptionDto } from './dto/pushSubscription.dto';
 
 @Controller('orders')
 @ApiTags('주문 API')
@@ -29,7 +30,7 @@ export class OrdersController {
 
   @ApiOperation({
     summary: '주문 생성',
-    description: '주문을 생성하는 API입니다. Headers = Authorization: Bearer ${token} ',
+    description: '주문을 생성하는 API입니다. Headers = Authorization: Bearer ${access_token}',
   })
   @ApiCreatedResponse({ description: '주문 생성 성공', type: Order })
   @ApiForbiddenResponse({
@@ -38,9 +39,13 @@ export class OrdersController {
   })
   @Roles(UserRole.USER)
   @Post()
-  async createOrder(@Body() createOrdersDto: CreateOrdersDto, @Req() req: any) {
+  async createOrder(@Body() createOrdersDto: CreateOrdersDto, @Req() req: any): Promise<Order> {
     createOrdersDto.user_id = req.user.userId;
+    const token = createOrdersDto?.token;
     const data = await this.ordersService.createOrder(createOrdersDto);
+    if (token) {
+      await this.ordersService.notifyCreateOrder(token);
+    }
     return data;
   }
 
@@ -53,9 +58,16 @@ export class OrdersController {
   @Roles(UserRole.RESTAURANT_MANAGER)
   @Patch()
   async updateOrder(@Req() req: any, @Body() updateOrdersDto: UpdateOrdersDto): Promise<Order> {
-    const objectId = new Types.ObjectId(updateOrdersDto._id);
-    await this.ordersService.validateRestaurant(req.user.userId, req.user.restaurantsId);
-    return await this.ordersService.updateOrder(updateOrdersDto, objectId);
+    const order = await this.ordersService.getOrder(new Types.ObjectId(updateOrdersDto._id));
+    await this.ordersService.validateRestaurant(order.restaurant_id, req.user.restaurantsId); // 해당 주문의 매장 관리 권한 확인
+
+    const updatedOrder = await this.ordersService.updateOrder(updateOrdersDto);
+
+    // 주문 상태가 변경되었을 때, 푸시 알림 전송
+    if (updateOrdersDto?.status && updatedOrder?.token) {
+      await this.ordersService.notifyUpdateOrder(updatedOrder.token, updatedOrder.status);
+    }
+    return updatedOrder;
   }
 
   // test code 필요
@@ -116,6 +128,21 @@ export class OrdersController {
   ): Promise<Order[]> {
     await this.ordersService.validateRestaurant(req.user.userId, id);
     return await this.ordersService.getRestauarntOrdersByDate(id, status);
+  }
+
+  @Post('testNotify')
+  async testNotify(@Body() Body: PushSubscriptionDto) {
+    const payload = JSON.stringify({
+      title: `테스트용 푸시 알림입니다.`,
+      Body: '테스트용 푸시 알림입니다.',
+      tag: '테스트용 푸시 알림입니다.',
+      requireInteraction: true,
+    });
+    try {
+      await sendNotification(Body, payload);
+    } catch (err) {
+      console.log(err);
+    }
   }
 
   @ApiOperation({ summary: '고객 주문 상태 조회', description: '주문을 조회하는 API입니다.' })

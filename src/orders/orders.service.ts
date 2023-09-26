@@ -7,6 +7,8 @@ import { Types, isValidObjectId } from 'mongoose';
 import { UsersService } from 'src/auth/user.service';
 import { GetOrdersByUserDto } from './dto/getOrdersByUser.dto';
 import { OrdersGateway } from './orders.gateway';
+import { sendNotification } from 'web-push';
+import { OrderStatusMessage, PushSubscriptionDto } from './dto/pushSubscription.dto';
 import { RestaurantsService } from 'src/restaurants/restaurants.service';
 
 @Injectable()
@@ -19,19 +21,20 @@ export class OrdersService {
   ) {}
 
   async createOrder(createOrdersDto: CreateOrdersDto): Promise<Order> {
-    if (!(await this.restaurantsService.isExistRestaurant(createOrdersDto.restaurant_id))) {
-      throw new NotFoundException('해당 매장이 존재하지 않습니다.');
-    }
 
+    const restaurant = await this.restaurantsService.findOne(createOrdersDto.restaurant_id);
+    createOrdersDto.restaurant_id = restaurant._id.toString();
+    createOrdersDto.restaurant_name = restaurant.name;
+    createOrdersDto.restaurant_address = restaurant.address;
     const order = await this.ordersRepository.createOrder(createOrdersDto);
-
+    
     this.ordersGateway.notifyOrderInfo(order);
-
+    
     return order;
   }
 
-  async updateOrder(updateOrdersDto: UpdateOrdersDto, id: Types.ObjectId): Promise<Order> {
-    return await this.ordersRepository.updateOrder(updateOrdersDto, id);
+  async updateOrder(updateOrdersDto: UpdateOrdersDto): Promise<Order> {
+    return await this.ordersRepository.updateOrder(updateOrdersDto);
   }
 
   async updateOrderStatus(id: Types.ObjectId, status: number): Promise<Order> {
@@ -56,7 +59,7 @@ export class OrdersService {
   async getOrdersByUser(id: string, page: number, pageSize: number, sort: number): Promise<GetOrdersByUserDto> {
     return await this.ordersRepository.getOrdersByUser(id, page, pageSize, sort);
   }
-
+  
   async getRestauarntOrdersByDate(id: string, status: number | undefined): Promise<Order[]> {
     if (status === undefined || Number.isNaN(status)) {
       return await this.ordersRepository.getRestauarntOrdersByDate(id);
@@ -72,12 +75,43 @@ export class OrdersService {
     throw new BadRequestException('해당 요청에 대한 권한이 없습니다.');
   }
 
-  // 유저가 해당 매장의 주문 접근 권한이 있는지 확인
-  async validateRestaurant(user_id: string, restaurant_id: string) {
-    const user = await this.usersService.findUserById(user_id);
-    if (user.restaurants_id.includes(restaurant_id)) {
+  // 유저가 해당 주문의 접근 권한이 있는지 확인
+  async validateRestaurant(restaurant_id: string, restaurantsId: string[]) {
+    if (restaurantsId.includes(restaurant_id)) {
       return true;
     }
+    
     throw new UnauthorizedException('해당 요청에 대한 권한이 없습니다.');
+  }
+
+  async notifyCreateOrder(token: PushSubscriptionDto) {
+    // payload는 인자로 받아서 처리해야함, 현재는 테스트용
+    const testPayload = JSON.stringify({
+      title: `주문이 접수 되었습니다.`,
+      badge: 'https://pocketrestaurant.net/favicon.ico',
+      body: 'Notification Body',
+      tag: 'Notification Tag',
+      requireInteraction: true,
+    });
+
+    try {
+      const result = await sendNotification(token, testPayload);
+    } catch (error) {
+      console.log(error);
+    }
+  }
+
+  async notifyUpdateOrder(token: PushSubscriptionDto, status: number) {
+    const payload = JSON.stringify({
+      title: `주문의 상태가 변경되었습니다.`,
+      body: `${status as OrderStatusMessage}`,
+      tag: 'Notification Tag',
+      requireInteraction: true,
+    });
+    try {
+      const result = await sendNotification(token, payload);
+    } catch (error) {
+      console.log(error);
+    }
   }
 }

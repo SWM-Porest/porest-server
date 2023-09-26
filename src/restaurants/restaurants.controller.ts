@@ -27,6 +27,7 @@ import {
   ApiResponse,
   ApiTags,
 } from '@nestjs/swagger';
+import { Http } from 'winston/lib/winston/transports';
 
 @Controller('restaurants')
 @ApiTags('매장 API')

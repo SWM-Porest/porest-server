@@ -10,7 +10,7 @@ import { AuthService } from 'src/auth/auth.service';
 import { UpdateOrdersDto } from './dto/updateOrders.dto';
 import { GetOrdersByUserDto } from './dto/getOrdersByUser.dto';
 
-jest.mock('./orders.service.ts');
+jest.mock('./orders.service');
 
 describe('OrdersController', () => {
   let ordersController: OrdersController;
@@ -43,8 +43,10 @@ describe('OrdersController', () => {
       _id: undefined,
       restaurant_id: '',
       restaurant_name: 'test',
+      restaurant_address: '',
       user_id: '',
       status: 1,
+      status_updated_at: undefined,
       table_id: 1,
       menus: JSON.parse('{"menu_id": "value"}'),
     };
@@ -55,6 +57,7 @@ describe('OrdersController', () => {
       _id: '60b6d1b0b9b3b1b4e8b8b0b1',
       menus: JSON.parse('{"menu_id": "value"}'),
       status: 1,
+      status_updated_at: undefined,
     };
   };
 
@@ -99,6 +102,7 @@ describe('OrdersController', () => {
 
   describe('PATCH /orders', () => {
     it('update order', async () => {
+      jest.spyOn(ordersService, 'getOrder').mockResolvedValue(order);
       jest.spyOn(ordersService, 'updateOrder').mockImplementation(() => Promise.resolve(order));
       const request = {
         user: {
