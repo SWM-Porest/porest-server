@@ -10,7 +10,7 @@ import { GetOrdersByUserDto } from './dto/getOrdersByUser.dto';
 export class OrdersRepository {
   constructor(@InjectModel('Orders') private readonly Order: Model<Order>) {}
 
-  async createOrder(createOrdersDto: CreateOrdersDto) {
+  async createOrder(createOrdersDto: CreateOrdersDto): Promise<Order> {
     return await this.Order.create(createOrdersDto);
   }
 
