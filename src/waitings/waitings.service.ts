@@ -5,8 +5,6 @@ import { WaitingsRepository } from './waitings.repository';
 import { RestaurantsService } from 'src/restaurants/restaurants.service';
 import { Waiting } from './schemas/waiting.schema';
 
-jest.mock('./waitings.repository');
-
 @Injectable()
 export class WaitingsService {
   constructor(
