@@ -1,6 +1,6 @@
 import { ApiProperty } from '@nestjs/swagger';
 import { IsNotEmpty } from 'class-validator';
-import { Schema, Types } from 'mongoose';
+import { Types } from 'mongoose';
 import { OrderMenu, OrderStatus, StatusUpdatedAt } from '../schemas/orders.schema';
 import { PushSubscriptionDto } from './pushSubscription.dto';
 

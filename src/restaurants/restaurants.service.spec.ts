@@ -4,8 +4,8 @@ import { RestaurantsService } from './restaurants.service';
 import { Menu, Restaurant } from './schemas/restaurants.schema';
 import { ImageUploadService } from '../common/uploader/image-upload.service';
 import { Types } from 'mongoose';
-import { UpdateMenusDto } from './dto/update-restaurants.dto';
 import { NotFoundException } from '@nestjs/common';
+
 jest.mock('./restaurants.repository');
 
 describe('RestaurantService', () => {
