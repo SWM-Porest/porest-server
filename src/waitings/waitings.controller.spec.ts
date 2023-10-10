@@ -49,6 +49,7 @@ describe('WaitingsController', () => {
   describe('create waiting', () => {
     const createWaitingDto: CreateWaitingDto = {
       restaurant_id: '60f0f1b0f1b1f1b1f1b1f1b2',
+      head_count: 2,
     };
     const req = {
       user: {
@@ -61,6 +62,8 @@ describe('WaitingsController', () => {
         restaurant_id: '60f0f1b0f1b1f1b1f1b1f1b2',
         user_id: '60f0f1b0f1b1f1b1f1b1f1b3',
         restaurant_name: 'test',
+        head_count: 2,
+        canceled_by: '',
         status: 1,
         created_at: new Date(),
         updated_at: new Date(),
