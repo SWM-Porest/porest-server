@@ -20,13 +20,15 @@ export class OrdersRepository {
     const order = await this.getOrder(_id);
     order.status_updated_at[status] = new Date();
 
-    const isupdated = (
-      await this.Order.updateOne({ _id }, { status_updated_at: { ...order.status_updated_at }, ...updateOrdersDto })
-    ).acknowledged;
+    const isupdated: Order = await this.Order.findOneAndUpdate(
+      { _id },
+      { status_updated_at: { ...order.status_updated_at }, ...updateOrdersDto },
+      { new: true },
+    );
     if (!isupdated) {
       throw new BadRequestException('주문 수정에 실패했습니다.');
     }
-    return this.getOrder(_id);
+    return isupdated;
   }
 
   async getOrder(_id: Types.ObjectId): Promise<Order> {
