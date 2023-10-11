@@ -3,6 +3,8 @@ import { CreateWaitingDto } from './dto/create-waiting.dto';
 import { WaitingsRepository } from './waitings.repository';
 import { RestaurantsService } from 'src/restaurants/restaurants.service';
 import { Waiting, WaitingStatus } from './schemas/waiting.schema';
+import { RequestUserDto } from 'src/auth/dto/requestUser.dto';
+import { Types } from 'mongoose';
 
 @Injectable()
 export class WaitingsService {
@@ -14,7 +16,7 @@ export class WaitingsService {
   async create(createWaitingDto: CreateWaitingDto, userId: string): Promise<Waiting> {
     const restaurantId: string = createWaitingDto.restaurant_id;
     try {
-      const waiting: Waiting = await this.findOneActive(userId, restaurantId, WaitingStatus.CALL);
+      const waiting: Waiting = await this.findUniqueActive(userId, restaurantId, WaitingStatus.CALL);
       if (waiting) {
         throw new BadRequestException('이미 대기 중입니다.');
       }
@@ -30,25 +32,40 @@ export class WaitingsService {
     }
   }
 
-  async findOneActive(userId: string, restaurantId: string, status: WaitingStatus): Promise<Waiting> {
-    const waiting: Waiting = await this.waitingsRepository.findOneActive(userId, restaurantId, status);
+  async findUniqueActive(userId: string, restaurantId: string, status: WaitingStatus): Promise<Waiting> {
+    const waiting: Waiting = await this.waitingsRepository.findUniqueActive(userId, restaurantId, status);
     if (!waiting) {
       throw new NotFoundException('대기 정보가 없습니다.');
     }
     return waiting;
   }
 
+  async findOneActive(waitingId: string, status: WaitingStatus): Promise<Waiting> {
+    const waiting: Waiting = await this.waitingsRepository.findOneActive(waitingId, status);
+    if (!waiting) {
+      throw new NotFoundException('대기 정보가 없습니다.');
+    }
+    return waiting;
+  }
+
+  async cancelOwnWaiting(waiting: Waiting, user: RequestUserDto): Promise<Waiting> {
+    if (waiting.user_id != user.userId) {
+      throw new BadRequestException('본인의 대기 정보만 취소할 수 있습니다.');
+    }
+    await this.cancelWaiting(waiting, user.userNick);
+    return waiting;
+  }
+
   async cancelWaiting(waiting: Waiting, userNick: string): Promise<Waiting> {
-    await this.findOneActive(waiting.user_id, waiting.restaurant_id, WaitingStatus.SEATED);
     waiting.status = 4;
     waiting['canceled_by'] = userNick;
 
     return await this.waitingsRepository.update(waiting);
   }
 
-  async callWaiting(waiting: Waiting, restaurantsId: string[]): Promise<Waiting> {
+  async callWaiting(waitingId: string, restaurantsId: string[]): Promise<Waiting> {
+    const waiting: Waiting = await this.findOneActive(waitingId, WaitingStatus.WAITING);
     await this.validateRestaurant(waiting.restaurant_id, restaurantsId);
-    await this.findOneActive(waiting.user_id, waiting.restaurant_id, WaitingStatus.WAITING);
     waiting.status = 2;
 
     return await this.waitingsRepository.update(waiting);
@@ -59,5 +76,9 @@ export class WaitingsService {
       return true;
     }
     throw new BadRequestException('해당 요청에 대한 권한이 없습니다.');
+  }
+
+  async findAllWaitingList(restaurantId: string): Promise<Waiting[]> {
+    return await this.waitingsRepository.findAllWaitingList(restaurantId);
   }
 }

@@ -7,7 +7,7 @@ import { RolesGuard } from 'src/auth/guard/roles.guard';
 import { UserRole } from 'src/auth/schemas/user.schema';
 import { Roles } from 'src/auth/decorator/roles.decorator';
 import { Waiting, WaitingStatus } from './schemas/waiting.schema';
-import { array } from 'joi';
+import { ReadWaitingDto } from './dto/read-waiting.dto';
 
 @Controller('waitings')
 @ApiTags('Waiting API')
@@ -17,7 +17,7 @@ export class WaitingsController {
 
   @ApiOperation({
     summary: '대기열 등록',
-    description: '대기 정보를 등록하는 API입니다. Headers = Authorization: Bearer ${access_token}',
+    description: '대기 정보를 등록하는 API입니다.',
   })
   @ApiResponse({
     status: 201,
@@ -33,7 +33,7 @@ export class WaitingsController {
 
   @ApiOperation({
     summary: '매장 대기열 조회',
-    description: '매장의 대기 중인 정보를 조회하는 API입니다.',
+    description: '매장의 대기 중인 고객 리스트를 조회하는 API입니다.',
   })
   @ApiResponse({
     status: 200,
@@ -44,14 +44,16 @@ export class WaitingsController {
   @ApiBearerAuth('access-token')
   @Roles(UserRole.RESTAURANT_MANAGER)
   @Get('restaurant/:restaurantId')
-  async findActiveWaitings(@Param('restaurantId') restaurantId: string) {
-    // return await this.waitingsService.findActiveWaitings(restaurantId);
+  async findActiveWaitings(@Param('restaurantId') restaurantId: string): Promise<Waiting[]> {
+    // 앞에 남은 대기인원 수도 같이 보내주기
+    // 대기중, 호출중인 대기자만 보내주기 순서는 호출중 > 대기중
+    const waitingList: Waiting[] = await this.waitingsService.findAllWaitingList(restaurantId);
+    return waitingList;
   }
 
   @ApiOperation({
-    summary: '대기열 조회',
-    description:
-      '대기 정보를 조회하는 API입니다. 본인의 대기 정보만 확인 가능. Headers = Authorization: Bearer ${access_token}',
+    summary: '고객 대기열 조회',
+    description: '고객의 대기 정보를 조회하는 API입니다. 본인의 대기 정보만 확인 가능.',
   })
   @ApiResponse({
     status: 200,
@@ -63,13 +65,12 @@ export class WaitingsController {
   @Get(':restaurantId')
   async findOne(@Req() req: any, @Param('restaurantId') restaurantId: string) {
     // 앞에 남은 대기인원 수도 같이 보내주기
-    return await this.waitingsService.findOneActive(req.user.userId, restaurantId, WaitingStatus.SEATED);
+    return await this.waitingsService.findUniqueActive(req.user.userId, restaurantId, WaitingStatus.SEATED);
   }
 
   @ApiOperation({
-    summary: '대기열 취소',
-    description:
-      '본인의 대기 정보를 삭제하는 API입니다. 본인의 대기 정보만 삭제 가능. Headers = Authorization: Bearer ${access_token}',
+    summary: '고객 대기열 취소',
+    description: '본인의 대기 정보를 삭제하는 API입니다. 본인의 대기 정보만 삭제 가능.',
   })
   @ApiResponse({
     status: 200,
@@ -79,17 +80,32 @@ export class WaitingsController {
   @ApiBearerAuth('access-token')
   @Roles(UserRole.USER)
   @Patch('cancel')
-  async cancelOwnWaiting(@Req() req: any, @Body() waiting: Waiting) {
-    if (req.user.userId === waiting.user_id) {
-      return await this.waitingsService.cancelWaiting(waiting, req.user.userNick);
-    } else {
-      throw new BadRequestException('본인의 대기 정보만 취소 가능합니다.');
-    }
+  async cancelOwnWaiting(@Req() req: any, @Body() readWaitingDto: ReadWaitingDto) {
+    const waiting: Waiting = await this.waitingsService.findOneActive(readWaitingDto._id, WaitingStatus.SEATED);
+    return await this.waitingsService.cancelOwnWaiting(waiting, req.user);
+  }
+
+  @ApiOperation({
+    summary: '매장 대기열 취소',
+    description: '매장의 대기 정보를 삭제하는 API입니다. 본인 매장의 대기 정보만 삭제 가능.',
+  })
+  @ApiResponse({
+    status: 200,
+    description: '대기열 취소 성공',
+    type: Waiting,
+  })
+  @ApiBearerAuth('access-token')
+  @Roles(UserRole.USER)
+  @Patch('managercancel')
+  async cancelWaiting(@Req() req: any, @Body() readWaitingDto: ReadWaitingDto) {
+    const waiting: Waiting = await this.waitingsService.findOneActive(readWaitingDto._id, WaitingStatus.SEATED);
+    await this.waitingsService.validateRestaurant(waiting.restaurant_id, req.user.restaurantsId);
+    return await this.waitingsService.cancelWaiting(waiting, req.user.userNick);
   }
 
   @ApiOperation({
     summary: '대기열 호출',
-    description: '대기자를 호출하는 API입니다. Headers = Authorization: Bearer ${access_token}',
+    description: '대기자를 호출하는 API입니다.',
   })
   @ApiResponse({
     status: 200,
@@ -99,7 +115,7 @@ export class WaitingsController {
   @ApiBearerAuth('access-token')
   @Roles(UserRole.RESTAURANT_MANAGER)
   @Patch('call')
-  async callWaiting(@Req() req: any, @Body() waiting: Waiting) {
-    return await this.waitingsService.callWaiting(waiting, req.user.restaurantsId);
+  async callWaiting(@Req() req: any, @Body() ReadWaitingDto: ReadWaitingDto) {
+    return await this.waitingsService.callWaiting(ReadWaitingDto._id, req.user.restaurantsId);
   }
 }

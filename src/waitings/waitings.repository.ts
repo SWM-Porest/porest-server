@@ -13,11 +13,21 @@ export class WaitingsRepository {
     return waiting;
   }
 
-  async findOneActive(userId: string, restaurantId: string, status: WaitingStatus): Promise<Waiting> {
+  async findUniqueActive(userId: string, restaurantId: string, status: WaitingStatus): Promise<Waiting> {
     const waiting: Waiting = await this.waitingsModel
       .findOne({
         user_id: userId,
         restaurant_id: restaurantId,
+        status: { $lte: status },
+      })
+      .exec(); // 없으면 null 반환
+    return waiting;
+  }
+
+  async findOneActive(waitingId: string, status: WaitingStatus): Promise<Waiting> {
+    const waiting: Waiting = await this.waitingsModel
+      .findOne({
+        _id: waitingId,
         status: { $lte: status },
       })
       .exec(); // 없으면 null 반환
@@ -31,9 +41,22 @@ export class WaitingsRepository {
           _id: waiting._id,
         },
         waiting,
-        { new: true },
+        {
+          new: true,
+        },
       )
       .exec();
     return updatedWaiting;
+  }
+
+  async findAllWaitingList(restaurantId: string): Promise<Waiting[]> {
+    const waitingList: Waiting[] = await this.waitingsModel
+      .find({
+        restaurant_id: restaurantId,
+        status: { $lte: WaitingStatus.CALL },
+      })
+      .sort({ status: -1, created_at: 1 })
+      .exec();
+    return waitingList;
   }
 }
