@@ -148,21 +148,33 @@ export class RestaurantsController {
     type: UpdateRestaurantsDto,
   })
   @UseGuards(AuthGuard('basic'))
-  @UseInterceptors(
-    FileFieldsInterceptor([
-      { name: 'image', maxCount: 10 },
-      { name: 'menuImage', maxCount: 100 },
-    ]),
-  )
   @Patch(':id')
   async updateRestaurant(
     @Param('id') id: string,
-    @Body() data: any,
-    @UploadedFiles() files: { image?: Express.Multer.File[]; menuImage?: Express.Multer.File[] },
+    @Body() updateRestaurantsDto: UpdateRestaurantsDto,
   ): Promise<Restaurant> {
-    const updateRestaurantsDto: UpdateRestaurantsDto = JSON.parse(data.updateRestaurantsDto);
+    return this.restaurantService.update(id, updateRestaurantsDto);
+  }
 
-    return this.restaurantService.update(id, updateRestaurantsDto, files);
+  @ApiOperation({
+    summary: '매장 배너 이미지 추가',
+    description: '매장 배너 이미지를 추가합니다.',
+  })
+  @UseInterceptors(FileFieldsInterceptor([{ name: 'image', maxCount: 6 }]))
+  @UseGuards(AuthGuard('basic'))
+  @Patch(':id/images')
+  async uploadRestaurantBannerImage(@Param('id') _id: string, @UploadedFiles() files: Express.Multer.File[]) {
+    return await this.restaurantService.addRestaurantBannerImage(_id, files);
+  }
+
+  @ApiOperation({
+    summary: '매장 배너 이미지 삭제',
+    description: '매장 배너 이미지를 삭제합니다.',
+  })
+  @UseGuards(AuthGuard('basic'))
+  @Delete(':id/images/:imageId')
+  async deleteImage(@Param('id') id: string, @Param('imageId') imageName: string) {
+    return await this.restaurantService.deleteImage(id, imageName);
   }
 
   @ApiOperation({
