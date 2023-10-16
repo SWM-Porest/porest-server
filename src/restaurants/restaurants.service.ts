@@ -48,44 +48,24 @@ export class RestaurantsService {
     }
   }
 
-  async update(
-    _id: string,
-    updateRestaurantsDto: UpdateRestaurantsDto,
-    files: { image?: Express.Multer.File[]; menuImage?: Express.Multer.File[] },
-  ) {
+  async update(_id: string, updateRestaurantsDto: UpdateRestaurantsDto) {
     // TODO: 이름 정책 어떻게 할 건지
     // if (await this.restaurantRepository.isExistRestaurant(updateRestaurantsDto.name)) {
     //   throw new HttpException('Name is Duplicated', HttpStatus.CONFLICT);
     // }
 
-    const banner_images = await this.imageUploadService.uploadImage(files['image'], UPLOAD_TYPE.RESTAURANT_BANNER);
-
-    if (files['menuImage']) {
-      const menuImageUploadPromises = files['menuImage'].map(async (file, index) => {
-        if (file.mimetype === 'application/octet-stream') {
-          return updateRestaurantsDto.menus[index].img;
-        }
-        const images = await this.imageUploadService.uploadImage([file], UPLOAD_TYPE.MENU);
-        if (
-          updateRestaurantsDto.menus &&
-          updateRestaurantsDto.menus.length > index &&
-          updateRestaurantsDto.menus[index].img
-        )
-          updateRestaurantsDto.menus[index].img = images.length > 0 ? images[0] : null;
-      });
-
-      await Promise.all(menuImageUploadPromises);
-    }
-
-    if (!updateRestaurantsDto.banner_images) {
-      updateRestaurantsDto.banner_images = [];
-    }
-
-    updateRestaurantsDto.banner_images = [...updateRestaurantsDto.banner_images, ...banner_images];
-
     return this.restaurantRepository.updateRestaurant(_id, updateRestaurantsDto);
   }
 
+  async addRestaurantBannerImage(_id: string, files: Express.Multer.File[]): Promise<Restaurant> {
+    const new_banner_images = await this.imageUploadService.uploadImage(files['image'], UPLOAD_TYPE.RESTAURANT_BANNER);
+
+    return this.restaurantRepository.addRestaurantBannerImage(_id, new_banner_images);
+  }
+
+  async deleteImage(_id: string, imageName: string): Promise<Restaurant> {
+    return this.restaurantRepository.deleteImage(_id, imageName);
+  }
   async addMenu(_id: string, createMenusDto: CreateMenusDto, files: Express.Multer.File[]): Promise<Restaurant> {
     const restaurant: Restaurant = await this.findOne(_id);
 

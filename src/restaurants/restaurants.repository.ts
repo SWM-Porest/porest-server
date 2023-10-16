@@ -35,18 +35,42 @@ export class RestaurantRepository {
   async isExistRestaurantName(name: string): Promise<boolean> {
     return (await this.restaurantModel.exists({ name })) ? true : false;
   }
-  async updateRestaurant(_id: string, updateRestaurantsDto: UpdateRestaurantsDto): Promise<Restaurant> {
-    updateRestaurantsDto.menus = await Promise.all(
-      updateRestaurantsDto.menus.map((menu) => {
-        if (!menu._id) {
-          return new this.menuModel(menu);
-        } else {
-          return menu;
-        }
-      }),
-    );
 
-    return await this.restaurantModel.findByIdAndUpdate(new Types.ObjectId(_id), updateRestaurantsDto, { new: true });
+  async updateRestaurant(_id: string, updateRestaurantsDto: UpdateRestaurantsDto): Promise<Restaurant> {
+    const updateQuery: { [key: string]: any } = {
+      $set: {
+        name: { $cond: [{ $not: [!updateRestaurantsDto.name] }, updateRestaurantsDto.name, '$name'] },
+        phone_number: {
+          $cond: [{ $not: [!updateRestaurantsDto.phone_number] }, updateRestaurantsDto.phone_number, '$phone_number'],
+        },
+        intro: { $cond: [{ $not: [!updateRestaurantsDto.intro] }, updateRestaurantsDto.intro, '$intro'] },
+        address: { $cond: [{ $not: [!updateRestaurantsDto.address] }, updateRestaurantsDto.address, '$address'] },
+      },
+    };
+
+    return await this.restaurantModel.findOneAndUpdate({ _id: new Types.ObjectId(_id) }, [updateQuery], { new: true });
+  }
+
+  async addRestaurantBannerImage(_id: string, updateRestaurantBannerImage: any): Promise<Restaurant> {
+    return await this.restaurantModel.findOneAndUpdate(
+      { _id: new Types.ObjectId(_id) },
+      {
+        $push: { banner_images: { $each: updateRestaurantBannerImage, $position: 0 } },
+      },
+      {
+        new: true,
+      },
+    );
+  }
+  async deleteImage(_id: string, imageName: string): Promise<Restaurant> {
+    // mongodb의 banner_images에서 filename이 imageName 과 같은 요소 삭제
+    return await this.restaurantModel
+      .findOneAndUpdate(
+        { _id: new Types.ObjectId(_id) },
+        { $pull: { banner_images: { filename: imageName } } },
+        { new: true },
+      )
+      .exec();
   }
 
   async findAll(): Promise<Restaurant[]> {
