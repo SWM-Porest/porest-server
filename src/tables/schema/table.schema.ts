@@ -20,4 +20,4 @@ export class Table {
 }
 
 export const TableSchema = SchemaFactory.createForClass(Table);
-TableSchema.index({ _id: 1 }, { unique: true });
+TableSchema.index({ _id: 1, restaurant_id: 1 }, { unique: true });
