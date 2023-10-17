@@ -21,15 +21,14 @@ export class OrdersService {
   ) {}
 
   async createOrder(createOrdersDto: CreateOrdersDto): Promise<Order> {
-
     const restaurant = await this.restaurantsService.findOne(createOrdersDto.restaurant_id);
     createOrdersDto.restaurant_id = restaurant._id.toString();
     createOrdersDto.restaurant_name = restaurant.name;
     createOrdersDto.restaurant_address = restaurant.address;
     const order = await this.ordersRepository.createOrder(createOrdersDto);
-    
+
     this.ordersGateway.notifyOrderInfo(order);
-    
+
     return order;
   }
 
@@ -59,7 +58,7 @@ export class OrdersService {
   async getOrdersByUser(id: string, page: number, pageSize: number, sort: number): Promise<GetOrdersByUserDto> {
     return await this.ordersRepository.getOrdersByUser(id, page, pageSize, sort);
   }
-  
+
   async getRestauarntOrdersByDate(id: string, status: number | undefined): Promise<Order[]> {
     if (status === undefined || Number.isNaN(status)) {
       return await this.ordersRepository.getRestauarntOrdersByDate(id);
@@ -80,7 +79,7 @@ export class OrdersService {
     if (restaurantsId.includes(restaurant_id)) {
       return true;
     }
-    
+
     throw new UnauthorizedException('해당 요청에 대한 권한이 없습니다.');
   }
 

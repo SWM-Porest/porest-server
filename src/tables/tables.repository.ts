@@ -17,6 +17,10 @@ export class TablesRepository {
     return await this.tableModel.findById(_id).exec();
   }
 
+  async findByRestaurantID(restaurant_id: string): Promise<Table[]> {
+    return await this.tableModel.find({ restaurant_id: { $eq: restaurant_id } }).exec();
+  }
+
   async addOrder(_id: string, order_id: string): Promise<Table> {
     return await this.tableModel.findByIdAndUpdate(
       { _id: new Types.ObjectId(_id) },

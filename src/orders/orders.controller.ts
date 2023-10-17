@@ -126,7 +126,7 @@ export class OrdersController {
     @Param('id') id: string,
     @Query('status') status: number | null = null,
   ): Promise<Order[]> {
-    await this.ordersService.validateRestaurant(req.user.userId, id);
+    await this.ordersService.validateRestaurant(req.user.userId, [id]);
     return await this.ordersService.getRestauarntOrdersByDate(id, status);
   }
 

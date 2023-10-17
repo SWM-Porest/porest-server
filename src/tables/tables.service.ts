@@ -16,6 +16,9 @@ export class TablesService {
     return await this.tableRespository.findOne(_id);
   }
 
+  async findByRestaurantID(restaurant_id: string): Promise<Table[]> {
+    return await this.tableRespository.findByRestaurantID(restaurant_id);
+  }
   async createTable(createTableDto: CreateTableDto): Promise<Table> {
     return await this.tableRespository.createTable(createTableDto);
   }

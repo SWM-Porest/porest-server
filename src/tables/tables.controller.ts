@@ -1,4 +1,4 @@
-import { Body, Controller, Delete, Get, Param, Patch, Post, Put } from '@nestjs/common';
+import { Body, Controller, Delete, Get, Param, Patch, Post } from '@nestjs/common';
 import { Table } from './schema/table.schema';
 import { TablesService } from './tables.service';
 import { CreateTableDto } from './dto/create-table.dto';
@@ -19,6 +19,12 @@ export class TablesController {
   @Get(':id')
   async findOne(@Param() _id: string): Promise<Table> {
     return await this.tableService.findOne(_id);
+  }
+
+  @ApiOperation({ summary: '매장별 테이블 조회' })
+  @Get('/restaurants/:restaurant_id')
+  async findByRestaurantID(@Param('restaurant_id') restaurant_id: string): Promise<Table[]> {
+    return await this.tableService.findByRestaurantID(restaurant_id);
   }
 
   @ApiOperation({ summary: '테이블 생성' })
