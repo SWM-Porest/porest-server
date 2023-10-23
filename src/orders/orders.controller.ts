@@ -119,14 +119,13 @@ export class OrdersController {
     required: true,
     description: '주문 상태 (1: 주문완료, 2: 조리중, 3: 조리완료, 4: 서빙완료, 5: 결제완료)',
   })
-  @Roles(UserRole.RESTAURANT_MANAGER)
   @Get('/restaurant/:id')
   async getOrdersByRestaurant(
     @Req() req: any,
     @Param('id') id: string,
     @Query('status') status: number | null = null,
   ): Promise<Order[]> {
-    await this.ordersService.validateRestaurant(req.user.userId, [id]);
+    // await this.ordersService.validateRestaurant(req.user.userId, [id]);
     return await this.ordersService.getRestauarntOrdersByDate(id, status);
   }
 
@@ -147,7 +146,6 @@ export class OrdersController {
 
   @ApiOperation({ summary: '고객 주문 상태 조회', description: '주문을 조회하는 API입니다.' })
   @ApiResponseProperty({ type: Order })
-  @Roles(UserRole.USER)
   @Get('/:id')
   async getOrder(@Param('id') id: string): Promise<Order> {
     try {

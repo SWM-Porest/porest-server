@@ -168,6 +168,16 @@ export class RestaurantsController {
   }
 
   @ApiOperation({
+    summary: '매장 메뉴 이미지 추가',
+    description: '매장 메뉴 이미지를 추가합니다.',
+  })
+  @UseInterceptors(FileFieldsInterceptor([{ name: 'image', maxCount: 1 }]))
+  @Patch(':id/menus/images')
+  async uploadMenuImage(@Param('id') _id: string, @UploadedFiles() files: Express.Multer.File[]) {
+    return await this.restaurantService.addMenuImage(_id, files);
+  }
+
+  @ApiOperation({
     summary: '매장 배너 이미지 삭제',
     description: '매장 배너 이미지를 삭제합니다.',
   })
@@ -186,12 +196,9 @@ export class RestaurantsController {
     type: CreateMenusDto,
   })
   @ApiResponse({ status: HttpStatus.CREATED, description: '매장 메뉴 추가 성공', type: Restaurant })
-  @UseGuards(AuthGuard('basic'))
-  @UseInterceptors(FileFieldsInterceptor([{ name: 'image', maxCount: 1 }]))
   @Post(':id/menus')
-  async addMenu(@Param('id') id: string, @Body() data: any, @UploadedFiles() files: Express.Multer.File[]) {
-    const createMenusDto: CreateMenusDto = JSON.parse(data.createMenusDto);
-    return await this.restaurantService.addMenu(id, createMenusDto, files);
+  async addMenu(@Param('id') id: string, @Body() createMenusDto: CreateMenusDto) {
+    return await this.restaurantService.addMenu(id, createMenusDto);
   }
 
   @ApiOperation({
@@ -203,12 +210,9 @@ export class RestaurantsController {
     type: UpdateMenusDto,
   })
   @ApiResponse({ status: HttpStatus.OK, description: '매장 메뉴 수정 성공', type: Restaurant })
-  @UseGuards(AuthGuard('basic'))
-  @UseInterceptors(FileFieldsInterceptor([{ name: 'image', maxCount: 1 }]))
   @Patch(':id/menus')
-  async updateMenu(@Param('id') id: string, @Body() data: any, @UploadedFiles() files: Express.Multer.File[]) {
-    const updateMenusDto: UpdateMenusDto = JSON.parse(data.updateMenusDto);
-    return await this.restaurantService.updateMenu(id, updateMenusDto, files);
+  async updateMenu(@Param('id') id: string, @Body() updateMenusDto: UpdateMenusDto) {
+    return await this.restaurantService.updateMenu(id, updateMenusDto);
   }
 
   @ApiOperation({
