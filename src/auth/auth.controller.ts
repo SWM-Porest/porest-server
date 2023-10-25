@@ -42,17 +42,16 @@ export class AuthController {
   })
   @UseGuards(KakaoAuthGuard)
   @Get('kakao/callback')
-  async kakaocallback(@Req() req, @Res() res: Response, @Headers('Referer') referer: string) {
+  async kakaocallback(@Req() req, @Res() res: Response) {
     if (req.user.type === 'login') {
-      res.cookie('access_token', req.user.access_token, { expires: new Date(Date.now() + 1000 * 60 * 60 * 24 * 30) });
+      res.cookie('access_token', req.user.access_token, { expires: new Date(Date.now() + 1000 * 60 * 60 * 24 * 7) });
       res.cookie('refresh_token', req.user.refresh_token, {
-        expires: new Date(Date.now() + 1000 * 60 * 60 * 24 * 30),
+        expires: new Date(Date.now() + 1000 * 60 * 60 * 24 * 90),
         httpOnly: true,
-        secure: true,
       });
     }
 
-    res.redirect(referer);
+    res.redirect('http://localhost:3000/login/redirection');
     res.end();
   }
 
@@ -87,11 +86,22 @@ export class AuthController {
     return false;
   }
 
+  // secure된 토큰값 클라이언트 전달
+  @ApiBearerAuth('refresh-token')
+  @ApiOperation({
+    summary: '리프레쉬 토큰값 전달',
+    description: '리프레쉬 토큰값을 전달하는 API입니다.',
+  })
+  @Get('getrefreshtoken')
+  async getRefreshToken(@Req() req: any) {
+    return !!req.cookies['refresh_token'];
+  }
+
   // 리프레쉬 토큰을 이용한 엑세스 토큰 재발급하기
   @ApiBearerAuth('refresh-token')
   @UseGuards(JwtRefreshGuard)
   @Get('refresh-accesstoken')
-  async refreshAccessToken() {
+  async refreshAccessToken(@Req() req: any) {
     return { success: true, message: 'new accessToken Issuance success' };
   }
 

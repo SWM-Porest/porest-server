@@ -1,12 +1,15 @@
 import { Injectable } from '@nestjs/common';
 import { InjectModel } from '@nestjs/mongoose';
 import { Model } from 'mongoose';
-import { Waiting, WaitingStatus } from './schemas/waiting.schema';
+import { Waiting, WaitingStatus, WaitingTeam } from './schemas/waiting.schema';
 import { CreateWaitingDto } from './dto/create-waiting.dto';
 
 @Injectable()
 export class WaitingsRepository {
-  constructor(@InjectModel('Waitings') private readonly waitingsModel: Model<Waiting>) {}
+  constructor(
+    @InjectModel('Waitings') private readonly waitingsModel: Model<Waiting>,
+    @InjectModel('WaitingTeams') private readonly waitingTeamsModel: Model<WaitingTeam>,
+  ) {}
 
   async create(createWaitingDto: CreateWaitingDto): Promise<Waiting> {
     const waiting: Waiting = await this.waitingsModel.create(createWaitingDto);
@@ -58,5 +61,23 @@ export class WaitingsRepository {
       .sort({ status: -1, created_at: 1 })
       .exec();
     return waitingList;
+  }
+
+  async getWaitingTeam(restaurantId: string): Promise<WaitingTeam> {
+    const waitingTeam: WaitingTeam = await this.waitingTeamsModel
+      .findOneAndUpdate({ restaurant_id: restaurantId }, {}, { upsert: true, new: true, setDefaultsOnInsert: true })
+      .exec();
+    return waitingTeam;
+  }
+
+  async updateWaitingTeam(restaurantId: string, updateWaiting: number): Promise<WaitingTeam> {
+    const waitingTeam: WaitingTeam = await this.waitingTeamsModel
+      .findOneAndUpdate(
+        { restaurant_id: restaurantId },
+        { $inc: { waiting_teams: updateWaiting } },
+        { upsert: true, new: true, setDefaultsOnInsert: true },
+      )
+      .exec();
+    return waitingTeam;
   }
 }

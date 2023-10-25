@@ -15,7 +15,6 @@ export class KakaoStrategy extends PassportStrategy(Strategy, 'kakao') {
     });
   }
   async validate(accessToken: string, refreshToken: string, profile: any, done: any): Promise<any> {
-    const user_id = profile.id;
     const user_email = profile._json.kakao_account?.email;
     const user_nick = profile._json.properties.nickname;
     const user_profile: RegistUserDTO = {
@@ -27,7 +26,7 @@ export class KakaoStrategy extends PassportStrategy(Strategy, 'kakao') {
       restaurants_id: [],
     };
     try {
-      const user = await this.authService.validateKakaoUser(user_id);
+      const user = await this.authService.validateEmail(user_email);
       if (user === null) {
         // 유저가 없을때
         const newUser = await this.userService.create(user_profile);

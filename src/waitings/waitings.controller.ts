@@ -28,7 +28,17 @@ export class WaitingsController {
   @Roles(UserRole.USER)
   @Post()
   async create(@Req() req: any, @Body() createWaitingDto: CreateWaitingDto) {
-    return await this.waitingsService.create(createWaitingDto, req.user.userId);
+    return await this.waitingsService.create(createWaitingDto, req.user);
+  }
+
+  @ApiOperation({
+    summary: '매장 대기팀 수 조회',
+    description: '매장의 대기 중인 팀의 수를 조회하는 API입니다.',
+  })
+  @Roles(UserRole.GUEST)
+  @Get(':restaurantId/team')
+  async getWaitingTeam(@Param('restaurantId') restaurantId: string) {
+    return await this.waitingsService.getWaitingTeam(restaurantId);
   }
 
   @ApiOperation({
@@ -43,9 +53,8 @@ export class WaitingsController {
   })
   @ApiBearerAuth('access-token')
   @Roles(UserRole.RESTAURANT_MANAGER)
-  @Get('restaurant/:restaurantId')
+  @Get(':restaurantId/restaurant')
   async findActiveWaitings(@Param('restaurantId') restaurantId: string): Promise<Waiting[]> {
-    // 앞에 남은 대기인원 수도 같이 보내주기
     // 대기중, 호출중인 대기자만 보내주기 순서는 호출중 > 대기중
     const waitingList: Waiting[] = await this.waitingsService.findAllWaitingList(restaurantId);
     return waitingList;
@@ -64,7 +73,6 @@ export class WaitingsController {
   @Roles(UserRole.USER)
   @Get(':restaurantId')
   async findOne(@Req() req: any, @Param('restaurantId') restaurantId: string) {
-    // 앞에 남은 대기인원 수도 같이 보내주기
     return await this.waitingsService.findUniqueActive(req.user.userId, restaurantId, WaitingStatus.SEATED);
   }
 
@@ -79,9 +87,9 @@ export class WaitingsController {
   })
   @ApiBearerAuth('access-token')
   @Roles(UserRole.USER)
-  @Patch('cancel')
-  async cancelOwnWaiting(@Req() req: any, @Body() readWaitingDto: ReadWaitingDto) {
-    const waiting: Waiting = await this.waitingsService.findOneActive(readWaitingDto._id, WaitingStatus.SEATED);
+  @Patch(':waitingId/cancel')
+  async cancelOwnWaiting(@Req() req: any, @Param('waitingId') waitingId: string): Promise<Waiting> {
+    const waiting: Waiting = await this.waitingsService.findOneActive(waitingId, WaitingStatus.SEATED);
     return await this.waitingsService.cancelOwnWaiting(waiting, req.user);
   }
 
@@ -96,9 +104,9 @@ export class WaitingsController {
   })
   @ApiBearerAuth('access-token')
   @Roles(UserRole.USER)
-  @Patch('managercancel')
-  async cancelWaiting(@Req() req: any, @Body() readWaitingDto: ReadWaitingDto) {
-    const waiting: Waiting = await this.waitingsService.findOneActive(readWaitingDto._id, WaitingStatus.SEATED);
+  @Patch(':waitingId/managercancel')
+  async cancelWaiting(@Req() req: any, @Param('waitingId') waitingId: string) {
+    const waiting: Waiting = await this.waitingsService.findOneActive(waitingId, WaitingStatus.SEATED);
     await this.waitingsService.validateRestaurant(waiting.restaurant_id, req.user.restaurantsId);
     return await this.waitingsService.cancelWaiting(waiting, req.user.userNick);
   }
@@ -114,8 +122,19 @@ export class WaitingsController {
   })
   @ApiBearerAuth('access-token')
   @Roles(UserRole.RESTAURANT_MANAGER)
-  @Patch('call')
-  async callWaiting(@Req() req: any, @Body() ReadWaitingDto: ReadWaitingDto) {
-    return await this.waitingsService.callWaiting(ReadWaitingDto._id, req.user.restaurantsId);
+  @Patch(':waitingId/call')
+  async callWaiting(@Req() req: any, @Param('waitingId') waitingId: string) {
+    return await this.waitingsService.callWaiting(waitingId, req.user.restaurantsId);
+  }
+
+  @ApiOperation({
+    summary: '대기열 입장',
+    description: '대기자를 입장 처리하는 API입니다.',
+  })
+  @ApiBearerAuth('access-token')
+  @Roles(UserRole.RESTAURANT_MANAGER)
+  @Patch(':waitingId/seated')
+  async seatedWaiting(@Param('waitingId') waitingId: string): Promise<Waiting> {
+    return await this.waitingsService.seatedWaiting(waitingId);
   }
 }

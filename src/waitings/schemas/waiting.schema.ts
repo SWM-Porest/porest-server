@@ -15,6 +15,13 @@ export class Waiting {
   user_id: string;
 
   @ApiProperty({
+    example: '김철수',
+    description: '대기하는 유저의 닉네임',
+  })
+  @Prop()
+  user_nick: string;
+
+  @ApiProperty({
     example: '60b9b0b9e6b3b3a0e4b9e0a0',
     description: '대기하는 레스토랑의 ID',
     required: true,
@@ -77,3 +84,54 @@ export enum WaitingStatus {
   SEATED = 3,
   CANCEL = 4,
 }
+
+@Schema()
+export class WaitingTeam {
+  _id: Types.ObjectId;
+
+  @ApiProperty({
+    example: '64c7031423eb115c376d6488',
+    description: '대기하는 레스토랑의 ID',
+    required: true,
+  })
+  @Prop({ required: true })
+  restaurant_id: string;
+
+  @ApiProperty({
+    example: '교동짬뽕',
+    description: '대기하는 레스토랑의 이름',
+  })
+  @Prop()
+  restaurant_name: string;
+
+  @ApiProperty({
+    example: 1,
+    description: '대기하는 팀의 수',
+    required: true,
+    default: 0,
+  })
+  @Prop({
+    required: true,
+    default: 0,
+  })
+  waiting_teams: number;
+
+  @ApiProperty({
+    example: '1900-01-01T00:00:00.000Z',
+    description: '생성 시간',
+    required: false,
+  })
+  @Prop()
+  created_at: Date;
+
+  @ApiProperty({
+    example: '1900-01-01T00:00:00.000Z',
+    description: '업데이트 시간',
+    required: false,
+  })
+  @Prop()
+  updated_at: Date;
+}
+
+export const WaitingTeamSchema = SchemaFactory.createForClass(WaitingTeam);
+WaitingTeamSchema.set('timestamps', { createdAt: 'created_at', updatedAt: 'updated_at' });
