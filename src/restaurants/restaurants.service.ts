@@ -1,4 +1,4 @@
-import { HttpException, HttpStatus, Injectable, NotFoundException } from '@nestjs/common';
+import { BadRequestException, HttpException, HttpStatus, Injectable, NotFoundException } from '@nestjs/common';
 import { CreateMenuOptionsDto, CreateMenusDto, CreateRestaurantsDto } from './dto/create-restaurants.dto';
 import { UpdateMenuOptionsDto, UpdateMenusDto, UpdateRestaurantsDto } from './dto/update-restaurants.dto';
 import { Types } from 'mongoose';
@@ -136,6 +136,15 @@ export class RestaurantsService {
     }
 
     return await this.restaurantRepository.deleteMenuOption(_id, menuId, menuOptionId);
+  }
+
+  async addCategory(id: string, category: string) {
+    const restaurant: Restaurant = await this.findOne(id);
+
+    if (restaurant.category.includes(category)) {
+      throw new BadRequestException('이미 존재하는 카테고리입니다.');
+    }
+    return await this.restaurantRepository.addCategory(id, category);
   }
 
   remove(_id: string) {

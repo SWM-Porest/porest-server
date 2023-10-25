@@ -7,6 +7,7 @@ import {
   Param,
   Patch,
   Post,
+  Query,
   UploadedFiles,
   UseGuards,
   UseInterceptors,
@@ -216,7 +217,6 @@ export class RestaurantsController {
     description: '매장 메뉴를 삭제합니다.',
   })
   @ApiResponse({ status: HttpStatus.OK, description: '매장 메뉴 삭제 성공', type: Restaurant })
-  @UseGuards(AuthGuard('basic'))
   @Delete(':id/menus/:menuId')
   async deleteMenu(@Param('id') id: string, @Param('menuId') menuId: string) {
     return await this.restaurantService.deleteMenu(id, menuId);
@@ -278,5 +278,15 @@ export class RestaurantsController {
     @Param('optionId') optionId: string,
   ) {
     return await this.restaurantService.deleteMenuOption(id, menuId, optionId);
+  }
+
+  @ApiOperation({
+    summary: '매장 카테고리 추가',
+    description: '매장 카테고리를 추가합니다.',
+  })
+  @ApiResponse({ status: HttpStatus.CREATED, description: '매장 카테고리 추가 성공', type: Restaurant })
+  @Post(':id/categories')
+  async addCategory(@Param('id') id: string, @Query('category') category: string) {
+    return await this.restaurantService.addCategory(id, category);
   }
 }
