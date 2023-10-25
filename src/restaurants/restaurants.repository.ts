@@ -140,4 +140,12 @@ export class RestaurantRepository {
       )
       .exec();
   }
+
+  async addCategory(id: string, category: string) {
+    return await this.restaurantModel.findByIdAndUpdate(
+      new Types.ObjectId(id),
+      { $push: { category: category } },
+      { new: true },
+    );
+  }
 }
