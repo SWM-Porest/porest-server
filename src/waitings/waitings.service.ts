@@ -22,9 +22,10 @@ export class WaitingsService {
       }
     } catch (error) {
       if (error instanceof NotFoundException) {
-        await this.restaurantsService.findOne(restaurantId);
+        const restaurant = await this.restaurantsService.findOne(restaurantId);
         createWaitingDto['user_id'] = user.userId;
         createWaitingDto['user_nick'] = user.userNick;
+        createWaitingDto['restaurant_name'] = restaurant.name;
         await this.waitingsRepository.updateWaitingTeam(createWaitingDto.restaurant_id, 1);
 
         return await this.waitingsRepository.create(createWaitingDto);
