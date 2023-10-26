@@ -28,21 +28,49 @@ export class RestaurantRepository {
     return await this.restaurantModel.create(restaurant);
   }
 
-  async isExistRestaurant(name: string): Promise<boolean> {
+  async isExistRestaurant(id: string): Promise<boolean> {
+    return (await this.restaurantModel.exists({ _id: new Types.ObjectId(id) })) ? true : false;
+  }
+
+  async isExistRestaurantName(name: string): Promise<boolean> {
     return (await this.restaurantModel.exists({ name })) ? true : false;
   }
-  async updateRestaurant(_id: string, updateRestaurantsDto: UpdateRestaurantsDto): Promise<Restaurant> {
-    updateRestaurantsDto.menus = await Promise.all(
-      updateRestaurantsDto.menus.map((menu) => {
-        if (!menu._id) {
-          return new this.menuModel(menu);
-        } else {
-          return menu;
-        }
-      }),
-    );
 
-    return await this.restaurantModel.findByIdAndUpdate(new Types.ObjectId(_id), updateRestaurantsDto, { new: true });
+  async updateRestaurant(_id: string, updateRestaurantsDto: UpdateRestaurantsDto): Promise<Restaurant> {
+    const updateQuery: { [key: string]: any } = {
+      $set: {
+        name: { $cond: [{ $not: [!updateRestaurantsDto.name] }, updateRestaurantsDto.name, '$name'] },
+        phone_number: {
+          $cond: [{ $not: [!updateRestaurantsDto.phone_number] }, updateRestaurantsDto.phone_number, '$phone_number'],
+        },
+        intro: { $cond: [{ $not: [!updateRestaurantsDto.intro] }, updateRestaurantsDto.intro, '$intro'] },
+        address: { $cond: [{ $not: [!updateRestaurantsDto.address] }, updateRestaurantsDto.address, '$address'] },
+      },
+    };
+
+    return await this.restaurantModel.findOneAndUpdate({ _id: new Types.ObjectId(_id) }, [updateQuery], { new: true });
+  }
+
+  async addRestaurantBannerImage(_id: string, updateRestaurantBannerImage: any): Promise<Restaurant> {
+    return await this.restaurantModel.findOneAndUpdate(
+      { _id: new Types.ObjectId(_id) },
+      {
+        $push: { banner_images: { $each: updateRestaurantBannerImage, $position: 0 } },
+      },
+      {
+        new: true,
+      },
+    );
+  }
+  async deleteImage(_id: string, imageName: string): Promise<Restaurant> {
+    // mongodb의 banner_images에서 filename이 imageName 과 같은 요소 삭제
+    return await this.restaurantModel
+      .findOneAndUpdate(
+        { _id: new Types.ObjectId(_id) },
+        { $pull: { banner_images: { filename: imageName } } },
+        { new: true },
+      )
+      .exec();
   }
 
   async findAll(): Promise<Restaurant[]> {
@@ -63,46 +91,15 @@ export class RestaurantRepository {
   }
 
   async updateMenu(_id: string, updateMenusDto: UpdateMenusDto): Promise<Restaurant> {
-    if (updateMenusDto._id === undefined) {
-      updateMenusDto.menuOptions.forEach((menuOption, index) => {
-        if (menuOption._id === undefined) {
-          const mo = new this.menuOptionModel(menuOption);
-          mo._id = new Types.ObjectId();
-          updateMenusDto.menuOptions[index] = mo;
-        } else {
-          updateMenusDto.menuOptions[index]._id = new Types.ObjectId(menuOption._id);
-        }
-      });
+    updateMenusDto._id = new Types.ObjectId(updateMenusDto._id);
 
-      const menu: CreateMenusDto = new this.menuModel(updateMenusDto);
-      menu._id = new Types.ObjectId(menu._id);
-
-      return await this.restaurantModel.findByIdAndUpdate(
-        new Types.ObjectId(_id),
-        { $push: { menus: menu } },
+    return await this.restaurantModel
+      .findOneAndUpdate(
+        { _id: new Types.ObjectId(_id), 'menus._id': new Types.ObjectId(updateMenusDto._id) },
+        { $set: { 'menus.$': updateMenusDto } },
         { new: true },
-      );
-    } else {
-      updateMenusDto._id = new Types.ObjectId(updateMenusDto._id);
-
-      updateMenusDto.menuOptions.forEach((menuOption, index) => {
-        if (menuOption._id === undefined) {
-          menuOption._id = new Types.ObjectId();
-
-          updateMenusDto.menuOptions[index] = menuOption;
-        } else {
-          updateMenusDto.menuOptions[index]._id = new Types.ObjectId(menuOption._id);
-        }
-      });
-
-      return await this.restaurantModel
-        .findOneAndUpdate(
-          { _id: new Types.ObjectId(_id), 'menus._id': new Types.ObjectId(updateMenusDto._id) },
-          { $set: { 'menus.$': updateMenusDto } },
-          { new: true },
-        )
-        .exec();
-    }
+      )
+      .exec();
   }
 
   async deleteMenu(_id: string, menuId: string): Promise<Restaurant> {
@@ -142,5 +139,13 @@ export class RestaurantRepository {
         { $pull: { 'menus.$.options': { _id: new Types.ObjectId(menuOptionId) } } },
       )
       .exec();
+  }
+
+  async addCategory(id: string, category: string) {
+    return await this.restaurantModel.findByIdAndUpdate(
+      new Types.ObjectId(id),
+      { $push: { category: category } },
+      { new: true },
+    );
   }
 }

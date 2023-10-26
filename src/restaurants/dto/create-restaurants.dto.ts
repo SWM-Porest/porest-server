@@ -185,6 +185,12 @@ export class CreateMenuOptionsDto {
   updated_at: Date;
 
   @ApiProperty({
+    description: '메뉴 옵션 필수 여부',
+    default: false,
+  })
+  isRequired: boolean;
+
+  @ApiProperty({
     description: '품절 여부',
     default: false,
   })
