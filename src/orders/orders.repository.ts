@@ -31,6 +31,10 @@ export class OrdersRepository {
     return isupdated;
   }
 
+  async updateOrderStatus(id: Types.ObjectId, status: number): Promise<Order> {
+    return await this.Order.findByIdAndUpdate({ _id: id }, { status }, { new: true });
+  }
+
   async getOrder(_id: Types.ObjectId): Promise<Order> {
     const order = await this.Order.findById(_id).exec();
     if (order) {
@@ -50,7 +54,10 @@ export class OrdersRepository {
     return { orders, page, pageSize, sort };
   }
 
-  async getOrdersByRestaurant(id: string, status: number): Promise<Order[]> {
+  async getRestauarntOrdersByDate(id: string): Promise<Order[]> {
+    return await this.Order.find({ restaurant_id: id }).sort({ created_at: 1 }).exec();
+  }
+  async getRestauarntOrdersByDateWithStatus(id: string, status: number): Promise<Order[]> {
     return await this.Order.find({ restaurant_id: id, status }).sort({ created_at: 1 }).exec();
   }
 

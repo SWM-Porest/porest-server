@@ -28,7 +28,11 @@ export class RestaurantRepository {
     return await this.restaurantModel.create(restaurant);
   }
 
-  async isExistRestaurant(name: string): Promise<boolean> {
+  async isExistRestaurant(id: string): Promise<boolean> {
+    return (await this.restaurantModel.exists({ _id: new Types.ObjectId(id) })) ? true : false;
+  }
+
+  async isExistRestaurantName(name: string): Promise<boolean> {
     return (await this.restaurantModel.exists({ name })) ? true : false;
   }
 
@@ -87,46 +91,15 @@ export class RestaurantRepository {
   }
 
   async updateMenu(_id: string, updateMenusDto: UpdateMenusDto): Promise<Restaurant> {
-    if (updateMenusDto._id === undefined) {
-      updateMenusDto.menuOptions.forEach((menuOption, index) => {
-        if (menuOption._id === undefined) {
-          const mo = new this.menuOptionModel(menuOption);
-          mo._id = new Types.ObjectId();
-          updateMenusDto.menuOptions[index] = mo;
-        } else {
-          updateMenusDto.menuOptions[index]._id = new Types.ObjectId(menuOption._id);
-        }
-      });
+    updateMenusDto._id = new Types.ObjectId(updateMenusDto._id);
 
-      const menu: CreateMenusDto = new this.menuModel(updateMenusDto);
-      menu._id = new Types.ObjectId(menu._id);
-
-      return await this.restaurantModel.findByIdAndUpdate(
-        new Types.ObjectId(_id),
-        { $push: { menus: menu } },
+    return await this.restaurantModel
+      .findOneAndUpdate(
+        { _id: new Types.ObjectId(_id), 'menus._id': new Types.ObjectId(updateMenusDto._id) },
+        { $set: { 'menus.$': updateMenusDto } },
         { new: true },
-      );
-    } else {
-      updateMenusDto._id = new Types.ObjectId(updateMenusDto._id);
-
-      updateMenusDto.menuOptions.forEach((menuOption, index) => {
-        if (menuOption._id === undefined) {
-          menuOption._id = new Types.ObjectId();
-
-          updateMenusDto.menuOptions[index] = menuOption;
-        } else {
-          updateMenusDto.menuOptions[index]._id = new Types.ObjectId(menuOption._id);
-        }
-      });
-
-      return await this.restaurantModel
-        .findOneAndUpdate(
-          { _id: new Types.ObjectId(_id), 'menus._id': new Types.ObjectId(updateMenusDto._id) },
-          { $set: { 'menus.$': updateMenusDto } },
-          { new: true },
-        )
-        .exec();
-    }
+      )
+      .exec();
   }
 
   async deleteMenu(_id: string, menuId: string): Promise<Restaurant> {

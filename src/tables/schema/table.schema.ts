@@ -4,10 +4,10 @@ import { Types } from 'mongoose';
 @Schema()
 export class Table {
   @Prop({ type: Types.ObjectId, required: true })
-  _id: Types.ObjectId;
-
-  @Prop({ type: Types.ObjectId, required: true })
   restaurant_id: Types.ObjectId;
+
+  @Prop({ type: [Types.ObjectId], required: false })
+  order_ids: Types.ObjectId[];
 
   @Prop({ required: true })
   name: string;
@@ -20,4 +20,4 @@ export class Table {
 }
 
 export const TableSchema = SchemaFactory.createForClass(Table);
-TableSchema.index({ name: 1, restaurant_id: 1 }, { unique: true });
+TableSchema.index({ _id: 1, restaurant_id: 1 }, { unique: true });

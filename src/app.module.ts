@@ -9,6 +9,7 @@ import { LoggerMiddleware } from './logger/logger.middleware';
 import { AuthModule } from './auth/auth.module';
 import { OrdersModule } from './orders/orders.module';
 import { WaitingsModule } from './waitings/waitings.module';
+import { TablesModule } from './tables/tables.module';
 
 @Module({
   imports: [
@@ -26,6 +27,7 @@ import { WaitingsModule } from './waitings/waitings.module';
     AuthModule,
     OrdersModule,
     WaitingsModule,
+    TablesModule,
   ],
   controllers: [AppController],
   providers: [AppService],

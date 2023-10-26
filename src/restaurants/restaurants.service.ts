@@ -3,7 +3,7 @@ import { CreateMenuOptionsDto, CreateMenusDto, CreateRestaurantsDto } from './dt
 import { UpdateMenuOptionsDto, UpdateMenusDto, UpdateRestaurantsDto } from './dto/update-restaurants.dto';
 import { Types } from 'mongoose';
 import { RestaurantRepository } from './restaurants.repository';
-import { Restaurant } from './schemas/restaurants.schema';
+import { Image, Restaurant } from './schemas/restaurants.schema';
 import { ImageUploadService } from '../common/uploader/image-upload.service';
 import { UPLOAD_TYPE } from '../common/uploader/upload-type';
 
@@ -14,10 +14,14 @@ export class RestaurantsService {
     private readonly imageUploadService: ImageUploadService,
   ) {}
 
+  async isExistRestaurant(id: string): Promise<boolean> {
+    return await this.restaurantRepository.isExistRestaurant(id);
+  }
+
   async createRestaurant(createRestaurantsDto: CreateRestaurantsDto, files: Express.Multer.File[]) {
     const { name } = createRestaurantsDto;
 
-    if (await this.restaurantRepository.isExistRestaurant(name)) {
+    if (await this.restaurantRepository.isExistRestaurantName(name)) {
       throw new HttpException('Name is Duplicated', HttpStatus.CONFLICT);
     }
 
@@ -59,41 +63,48 @@ export class RestaurantsService {
     return this.restaurantRepository.addRestaurantBannerImage(_id, new_banner_images);
   }
 
+  async addMenuImage(_id: string, files: Express.Multer.File[]): Promise<Image> {
+    const new_menu_image = await this.imageUploadService.uploadImage(files['image'], UPLOAD_TYPE.MENU);
+
+    return new_menu_image[0];
+  }
+
   async deleteImage(_id: string, imageName: string): Promise<Restaurant> {
     return this.restaurantRepository.deleteImage(_id, imageName);
   }
-  async addMenu(_id: string, createMenusDto: CreateMenusDto, files: Express.Multer.File[]): Promise<Restaurant> {
+
+  async addMenu(_id: string, createMenusDto: CreateMenusDto): Promise<Restaurant> {
     const restaurant: Restaurant = await this.findOne(_id);
 
     if (!restaurant) {
       throw new NotFoundException(`Not Found Restaurant by id${_id}`);
     }
 
-    const images = await this.imageUploadService.uploadImage(files['image'], UPLOAD_TYPE.MENU);
-    createMenusDto.img = images.length > 0 ? images[0] : null;
+    // const images = await this.imageUploadService.uploadImage(files['image'], UPLOAD_TYPE.MENU);
+    // createMenusDto.img = images.length > 0 ? images[0] : null;
 
     return await this.restaurantRepository.addMenu(_id, createMenusDto);
   }
 
-  async updateMenu(_id: string, updateMenusDto: UpdateMenusDto, files: Express.Multer.File[]) {
+  async updateMenu(_id: string, updateMenusDto: UpdateMenusDto) {
     const restaurant: Restaurant = await this.findOne(_id);
 
     if (!restaurant) {
       throw new NotFoundException(`Not Found Restaurant by id${_id}`);
     }
 
-    if (files['image'] && files['image'].length > 0) {
-      await Promise.all(
-        files['image'].map(async (file, index) => {
-          if (file.mimetype === 'application/octet-stream') {
-            return updateMenusDto.img;
-          }
-          const images = await this.imageUploadService.uploadImage(files['image'], UPLOAD_TYPE.MENU);
+    // if (files['image'] && files['image'].length > 0) {
+    //   await Promise.all(
+    //     files['image'].map(async (file, index) => {
+    //       if (file.mimetype === 'application/octet-stream') {
+    //         return updateMenusDto.img;
+    //       }
+    //       const images = await this.imageUploadService.uploadImage(files['image'], UPLOAD_TYPE.MENU);
 
-          updateMenusDto.img = images.length > 0 ? images[0] : null;
-        }),
-      );
-    }
+    //       updateMenusDto.img = images.length > 0 ? images[0] : null;
+    //     }),
+    //   );
+    // }
 
     return await this.restaurantRepository.updateMenu(_id, updateMenusDto);
   }

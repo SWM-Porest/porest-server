@@ -1,4 +1,4 @@
-import { BadRequestException, Injectable } from '@nestjs/common';
+import { BadRequestException, Injectable, NotFoundException, UnauthorizedException } from '@nestjs/common';
 import { OrdersRepository } from './orders.repository';
 import { CreateOrdersDto } from './dto/createOrders.dto';
 import { UpdateOrdersDto } from './dto/updateOrders.dto';
@@ -6,6 +6,7 @@ import { Order } from './schemas/orders.schema';
 import { Types, isValidObjectId } from 'mongoose';
 import { UsersService } from 'src/auth/user.service';
 import { GetOrdersByUserDto } from './dto/getOrdersByUser.dto';
+import { OrdersGateway } from './orders.gateway';
 import { sendNotification } from 'web-push';
 import { OrderStatusMessage, PushSubscriptionDto } from './dto/pushSubscription.dto';
 import { RestaurantsService } from 'src/restaurants/restaurants.service';
@@ -15,6 +16,7 @@ export class OrdersService {
   constructor(
     private readonly ordersRepository: OrdersRepository,
     private readonly usersService: UsersService,
+    private readonly ordersGateway: OrdersGateway,
     private readonly restaurantsService: RestaurantsService,
   ) {}
 
@@ -25,11 +27,18 @@ export class OrdersService {
     createOrdersDto.restaurant_address = restaurant.address;
     // 메뉴가격, 옵션가격 검증돌리기. 이름 없으면 주문에러뱉기
     const order = await this.ordersRepository.createOrder(createOrdersDto);
+
+    this.ordersGateway.notifyOrderInfo(order);
+
     return order;
   }
 
   async updateOrder(updateOrdersDto: UpdateOrdersDto): Promise<Order> {
     return await this.ordersRepository.updateOrder(updateOrdersDto);
+  }
+
+  async updateOrderStatus(id: Types.ObjectId, status: number): Promise<Order> {
+    return await this.ordersRepository.updateOrderStatus(id, status);
   }
 
   async deleteOrder(_id: Types.ObjectId) {
@@ -51,8 +60,12 @@ export class OrdersService {
     return await this.ordersRepository.getOrdersByUser(id, page, pageSize, sort);
   }
 
-  async getOrdersByRestaurant(id: string, status: number): Promise<Order[]> {
-    return await this.ordersRepository.getOrdersByRestaurant(id, status);
+  async getRestauarntOrdersByDate(id: string, status: number | undefined): Promise<Order[]> {
+    if (status === undefined || Number.isNaN(status)) {
+      return await this.ordersRepository.getRestauarntOrdersByDate(id);
+    } else {
+      return await this.ordersRepository.getRestauarntOrdersByDateWithStatus(id, status);
+    }
   }
 
   async validateUser(id: Types.ObjectId, user_id: Types.ObjectId) {
@@ -67,8 +80,8 @@ export class OrdersService {
     if (restaurantsId.includes(restaurant_id)) {
       return true;
     }
-    console.log('restaurantList에 해당 매장이 없음');
-    throw new BadRequestException('해당 요청에 대한 권한이 없습니다.');
+
+    throw new UnauthorizedException('해당 요청에 대한 권한이 없습니다.');
   }
 
   async notifyCreateOrder(token: PushSubscriptionDto) {

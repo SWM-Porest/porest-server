@@ -44,6 +44,9 @@ export class MenuOption {
   isSoldOut: boolean;
 
   @Prop()
+  isRequired: boolean;
+
+  @Prop()
   maxSelect: number;
 
   @Prop({ type: [Object] })

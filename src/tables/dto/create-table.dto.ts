@@ -4,12 +4,6 @@ import { Types } from 'mongoose';
 
 export class CreateTableDto {
   @ApiProperty({
-    description: '테이블 ID',
-    required: false,
-  })
-  @IsNotEmpty()
-  _id: Types.ObjectId;
-  @ApiProperty({
     description: '매장 ID',
     required: true,
   })
@@ -24,13 +18,8 @@ export class CreateTableDto {
   name: string;
 
   @ApiProperty({
-    description: '테이블 생성일',
+    description: '주문 IDs',
     required: false,
   })
-  created_at: Date;
-  @ApiProperty({
-    description: '테이블 수정일',
-    required: false,
-  })
-  updated_at: Date;
+  order_ids: Types.ObjectId[];
 }
