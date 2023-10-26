@@ -51,7 +51,7 @@ export class AuthController {
       });
     }
 
-    res.redirect('http://localhost:3000/login/redirection');
+    res.redirect(process.env.REDIRECT_URL);
     res.end();
   }
 
