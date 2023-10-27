@@ -16,6 +16,14 @@ export class AuthService {
     return user;
   }
 
+  async validateEmail(email: string): Promise<any> {
+    const user = await this.usersService.findUserByEmail(email);
+    if (!user) {
+      return null;
+    }
+    return user;
+  }
+
   async createLoginToken(user: User) {
     const payload = {
       userId: user._id.toString(),
@@ -33,13 +41,13 @@ export class AuthService {
 
   async createRefreshToken(user: User): Promise<string> {
     const payload = {
-      userId: user._id,
+      userId: user._id.toString(),
       userToken: 'refreshToken',
     };
 
     return this.jwtService.sign(payload, {
       secret: process.env.JWT_SECRET,
-      expiresIn: '30d',
+      expiresIn: '90d',
     });
   }
 

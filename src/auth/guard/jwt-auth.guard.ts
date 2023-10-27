@@ -51,7 +51,7 @@ export class JwtAuthGuard extends AuthGuard('jwt') {
       const tokenExp = new Date(token_verify['exp'] * 1000);
       const current_time = new Date();
 
-      const time_remaining = Math.floor((tokenExp.getTime() - current_time.getTime()) / 1000 / 60 / 60 / 24);
+      const time_remaining = Math.floor((tokenExp.getTime() - current_time.getTime()) / (1000 * 60 * 60 * 24));
 
       if (token_verify.userToken === 'accessToken') {
         if (time_remaining < 4) {

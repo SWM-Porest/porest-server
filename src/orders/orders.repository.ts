@@ -10,7 +10,7 @@ import { GetOrdersByUserDto } from './dto/getOrdersByUser.dto';
 export class OrdersRepository {
   constructor(@InjectModel('Orders') private readonly Order: Model<Order>) {}
 
-  async createOrder(createOrdersDto: CreateOrdersDto) {
+  async createOrder(createOrdersDto: CreateOrdersDto): Promise<Order> {
     return await this.Order.create(createOrdersDto);
   }
 
@@ -20,13 +20,15 @@ export class OrdersRepository {
     const order = await this.getOrder(_id);
     order.status_updated_at[status] = new Date();
 
-    const isupdated = (
-      await this.Order.updateOne({ _id }, { status_updated_at: { ...order.status_updated_at }, ...updateOrdersDto })
-    ).acknowledged;
+    const isupdated: Order = await this.Order.findOneAndUpdate(
+      { _id },
+      { status_updated_at: { ...order.status_updated_at }, ...updateOrdersDto },
+      { new: true },
+    );
     if (!isupdated) {
       throw new BadRequestException('주문 수정에 실패했습니다.');
     }
-    return this.getOrder(_id);
+    return isupdated;
   }
 
   async updateOrderStatus(id: Types.ObjectId, status: number): Promise<Order> {

@@ -25,6 +25,7 @@ export class OrdersService {
     createOrdersDto.restaurant_id = restaurant._id.toString();
     createOrdersDto.restaurant_name = restaurant.name;
     createOrdersDto.restaurant_address = restaurant.address;
+    // 메뉴가격, 옵션가격 검증돌리기. 이름 없으면 주문에러뱉기
     const order = await this.ordersRepository.createOrder(createOrdersDto);
 
     this.ordersGateway.notifyOrderInfo(order);

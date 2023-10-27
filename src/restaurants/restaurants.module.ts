@@ -23,5 +23,6 @@ import { ImageUploadService } from 'src/common/uploader/image-upload.service';
   ],
   controllers: [RestaurantsController],
   providers: [RestaurantsService, RestaurantRepository, ImageUploadService],
+  exports: [RestaurantsService, RestaurantRepository, ImageUploadService],
 })
 export class RestaurantsModule {}

@@ -14,13 +14,12 @@ export class JwtRefreshGuard extends AuthGuard('jwt') {
     const request = context.switchToHttp().getRequest();
     const response = context.switchToHttp().getResponse();
 
-    const { authorization } = request.headers;
-    if (authorization === undefined) {
+    const { refresh_token } = request.cookies;
+    if (refresh_token === undefined) {
       throw new HttpException('Refresh Token 전송 안됨', HttpStatus.UNAUTHORIZED);
     }
 
-    const refreshToken = authorization.replace('Bearer ', '');
-    const refreshTokenValidate = await this.validate(refreshToken);
+    const refreshTokenValidate = await this.validate(refresh_token);
 
     response.cookie('access_token', refreshTokenValidate, {
       expires: new Date(Date.now() + 1000 * 60 * 60 * 24 * 7),
