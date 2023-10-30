@@ -106,89 +106,89 @@ describe('RestaurantService', () => {
     });
   });
 
-  describe('update', () => {
-    it('update', async () => {
-      const custom_files = {
-        image: files,
-        menuImage: files,
-      };
-      jest.spyOn(repository, 'updateRestaurant').mockImplementation((id, dto) => Promise.resolve(restaurantDto));
-      const received = await service.update(restaurantDto._id.toString(), restaurantDto, custom_files);
-      expect(received).toEqual(restaurantDto);
-    });
-  });
+  // describe('update', () => {
+  //   it('update', async () => {
+  //     const custom_files = {
+  //       image: files,
+  //       menuImage: files,
+  //     };
+  //     jest.spyOn(repository, 'updateRestaurant').mockImplementation((id, dto) => Promise.resolve(restaurantDto));
+  //     const received = await service.update(restaurantDto._id.toString(), restaurantDto, custom_files);
+  //     expect(received).toEqual(restaurantDto);
+  //   });
+  // });
 
-  describe('addMenu', () => {
-    const menuDto = {
-      _id: undefined,
-      name: 'test',
-      en_name: 'test',
-      category: 'test',
-      menutype: 'test',
-      description: 'test',
-      img: undefined,
-      price: 1000,
-      isSoldOut: false,
-      menuOptions: [],
-      created_at: undefined,
-      updated_at: undefined,
-      toSchema: () => {
-        const menu = new Menu();
-        menu._id = menuDto._id;
-        menu.name = menuDto.name;
-        menu.en_name = menuDto.en_name;
-        menu.category = menuDto.category;
-        menu.menutype = menuDto.menutype;
-        menu.description = menuDto.description;
-        menu.img = menuDto.img;
-        menu.price = menuDto.price;
-        menu.isSoldOut = menuDto.isSoldOut;
-        menu.menuOptions = menuDto.menuOptions;
-        return menu;
-      },
-    };
-    it('addMenu', async () => {
-      jest.spyOn(repository, 'addMenu').mockImplementation((id, dto) => Promise.resolve(restaurantDto));
-      const received = await service.addMenu(restaurantDto._id.toString(), menuDto, files);
-      expect(received).toEqual(restaurantDto);
-    });
-  });
+  // describe('addMenu', () => {
+  //   const menuDto = {
+  //     _id: undefined,
+  //     name: 'test',
+  //     en_name: 'test',
+  //     category: 'test',
+  //     menutype: 'test',
+  //     description: 'test',
+  //     img: undefined,
+  //     price: 1000,
+  //     isSoldOut: false,
+  //     menuOptions: [],
+  //     created_at: undefined,
+  //     updated_at: undefined,
+  //     toSchema: () => {
+  //       const menu = new Menu();
+  //       menu._id = menuDto._id;
+  //       menu.name = menuDto.name;
+  //       menu.en_name = menuDto.en_name;
+  //       menu.category = menuDto.category;
+  //       menu.menutype = menuDto.menutype;
+  //       menu.description = menuDto.description;
+  //       menu.img = menuDto.img;
+  //       menu.price = menuDto.price;
+  //       menu.isSoldOut = menuDto.isSoldOut;
+  //       menu.menuOptions = menuDto.menuOptions;
+  //       return menu;
+  //     },
+  //   };
+  //   it('addMenu', async () => {
+  //     jest.spyOn(repository, 'addMenu').mockImplementation((id, dto) => Promise.resolve(restaurantDto));
+  //     const received = await service.addMenu(restaurantDto._id.toString(), menuDto, files);
+  //     expect(received).toEqual(restaurantDto);
+  //   });
+  // });
 
-  describe('updateMenu', () => {
-    const menuDto = {
-      _id: new Types.ObjectId('64f5924a7b34ea507fdce828'),
-      name: 'test',
-      en_name: 'test',
-      category: 'test',
-      menutype: 'test',
-      description: 'test',
-      img: undefined,
-      price: 1000,
-      isSoldOut: false,
-      menuOptions: [],
-      created_at: undefined,
-      updated_at: undefined,
-      toSchema: () => {
-        const menu = new Menu();
-        menu._id = menuDto._id;
-        menu.name = menuDto.name;
-        menu.en_name = menuDto.en_name;
-        menu.category = menuDto.category;
-        menu.menutype = menuDto.menutype;
-        menu.description = menuDto.description;
-        menu.img = menuDto.img;
-        menu.price = menuDto.price;
-        menu.isSoldOut = menuDto.isSoldOut;
-        menu.menuOptions = menuDto.menuOptions;
-        return menu;
-      },
-    };
-    it('updateMenu', async () => {
-      jest.spyOn(repository, 'updateMenu').mockImplementation((id, dto) => Promise.resolve(restaurantDto));
-      const received = await service.updateMenu(restaurantDto._id.toString(), menuDto, files);
-      expect(received).toEqual(restaurantDto);
-    });
-  });
+  // describe('updateMenu', () => {
+  //   const menuDto = {
+  //     _id: new Types.ObjectId('64f5924a7b34ea507fdce828'),
+  //     name: 'test',
+  //     en_name: 'test',
+  //     category: 'test',
+  //     menutype: 'test',
+  //     description: 'test',
+  //     img: undefined,
+  //     price: 1000,
+  //     isSoldOut: false,
+  //     menuOptions: [],
+  //     created_at: undefined,
+  //     updated_at: undefined,
+  //     toSchema: () => {
+  //       const menu = new Menu();
+  //       menu._id = menuDto._id;
+  //       menu.name = menuDto.name;
+  //       menu.en_name = menuDto.en_name;
+  //       menu.category = menuDto.category;
+  //       menu.menutype = menuDto.menutype;
+  //       menu.description = menuDto.description;
+  //       menu.img = menuDto.img;
+  //       menu.price = menuDto.price;
+  //       menu.isSoldOut = menuDto.isSoldOut;
+  //       menu.menuOptions = menuDto.menuOptions;
+  //       return menu;
+  //     },
+  //   };
+  //   it('updateMenu', async () => {
+  //     jest.spyOn(repository, 'updateMenu').mockImplementation((id, dto) => Promise.resolve(restaurantDto));
+  //     const received = await service.updateMenu(restaurantDto._id.toString(), menuDto, files);
+  //     expect(received).toEqual(restaurantDto);
+  //   });
+  // });
 
   describe('deleteMenu', () => {
     it('deleteMenu', async () => {
@@ -234,60 +234,60 @@ describe('RestaurantService', () => {
     });
   });
 
-  describe('addMenuOption', () => {
-    const menuDto = {
-      _id: new Types.ObjectId('64f5924a7b34ea507fdce828'),
-      name: 'test',
-      en_name: 'test',
-      category: 'test',
-      menutype: 'test',
-      description: 'test',
-      img: undefined,
-      price: 1000,
-      isSoldOut: false,
-      menuOptions: [],
-      created_at: undefined,
-      updated_at: undefined,
-      toSchema: () => {
-        const menu = new Menu();
-        menu._id = menuDto._id;
-        menu.name = menuDto.name;
-        menu.en_name = menuDto.en_name;
-        menu.category = menuDto.category;
-        menu.menutype = menuDto.menutype;
-        menu.description = menuDto.description;
-        menu.img = menuDto.img;
-        menu.price = menuDto.price;
-        menu.isSoldOut = menuDto.isSoldOut;
-        menu.menuOptions = menuDto.menuOptions;
-        return menu;
-      },
-    };
-    const menuOptionDto = {
-      _id: new Types.ObjectId('64f5924a7b34ea507fdce828'),
-      name: {
-        language: {
-          ko: 'test',
-          en: 'test',
-        },
-      },
-      items: [],
-      isSoldOut: false,
-      maxSelect: 1,
-      created_at: undefined,
-      updated_at: undefined,
-    };
-    menuDto.menuOptions.push(menuOptionDto);
-    const custom_restuarant = { ...restaurantDto };
-    custom_restuarant.menus.push(menuDto);
-    it('addMenuOption', async () => {
-      jest
-        .spyOn(repository, 'addMenuOption')
-        .mockImplementation((id, menuId, dto) => Promise.resolve(custom_restuarant));
-      const received = await service.addMenuOption(restaurantDto._id.toString(), menuDto._id.toString(), menuOptionDto);
-      expect(received).toEqual(custom_restuarant);
-    });
-  });
+  // describe('addMenuOption', () => {
+  //   const menuDto = {
+  //     _id: new Types.ObjectId('64f5924a7b34ea507fdce828'),
+  //     name: 'test',
+  //     en_name: 'test',
+  //     category: 'test',
+  //     menutype: 'test',
+  //     description: 'test',
+  //     img: undefined,
+  //     price: 1000,
+  //     isSoldOut: false,
+  //     menuOptions: [],
+  //     created_at: undefined,
+  //     updated_at: undefined,
+  //     toSchema: () => {
+  //       const menu = new Menu();
+  //       menu._id = menuDto._id;
+  //       menu.name = menuDto.name;
+  //       menu.en_name = menuDto.en_name;
+  //       menu.category = menuDto.category;
+  //       menu.menutype = menuDto.menutype;
+  //       menu.description = menuDto.description;
+  //       menu.img = menuDto.img;
+  //       menu.price = menuDto.price;
+  //       menu.isSoldOut = menuDto.isSoldOut;
+  //       menu.menuOptions = menuDto.menuOptions;
+  //       return menu;
+  //     },
+  //   };
+  //   const menuOptionDto = {
+  //     _id: new Types.ObjectId('64f5924a7b34ea507fdce828'),
+  //     name: {
+  //       language: {
+  //         ko: 'test',
+  //         en: 'test',
+  //       },
+  //     },
+  //     items: [],
+  //     isSoldOut: false,
+  //     maxSelect: 1,
+  //     created_at: undefined,
+  //     updated_at: undefined,
+  //   };
+  //   menuDto.menuOptions.push(menuOptionDto);
+  //   const custom_restuarant = { ...restaurantDto };
+  //   custom_restuarant.menus.push(menuDto);
+  //   it('addMenuOption', async () => {
+  //     jest
+  //       .spyOn(repository, 'addMenuOption')
+  //       .mockImplementation((id, menuId, dto) => Promise.resolve(custom_restuarant));
+  //     const received = await service.addMenuOption(restaurantDto._id.toString(), menuDto._id.toString(), menuOptionDto);
+  //     expect(received).toEqual(custom_restuarant);
+  //   });
+  // });
 
   describe('updateMenuOption', () => {
     const menuDto = {

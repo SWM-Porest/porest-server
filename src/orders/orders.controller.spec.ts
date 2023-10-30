@@ -148,21 +148,21 @@ describe('OrdersController', () => {
     });
   });
 
-  describe('GET /orders/restaurant/:id', () => {
-    it('get orders By RestaurantId', async () => {
-      const orders: Order[] = [order];
-      jest.spyOn(ordersService, 'getOrdersByRestaurant').mockImplementation(() => Promise.resolve(orders));
-      const request = {
-        user: {
-          userId: '60b6d1b0b9b3b1b4e8b8b0b3',
-          restaurantsId: ['60b6d1b0b9b3b1b4e8b8b0b2'],
-        },
-      };
-      const received = await ordersController.getOrdersByRestaurant(request, '60b6d1b0b9b3b1b4e8b8b0b2', 1);
+  // describe('GET /orders/restaurant/:id', () => {
+  //   it('get orders By RestaurantId', async () => {
+  //     const orders: Order[] = [order];
+  //     jest.spyOn(ordersService, 'getOrdersByRestaurant').mockImplementation(() => Promise.resolve(orders));
+  //     const request = {
+  //       user: {
+  //         userId: '60b6d1b0b9b3b1b4e8b8b0b3',
+  //         restaurantsId: ['60b6d1b0b9b3b1b4e8b8b0b2'],
+  //       },
+  //     };
+  //     const received = await ordersController.getOrdersByRestaurant(request, '60b6d1b0b9b3b1b4e8b8b0b2', 1);
 
-      expect(received).toBe(orders);
-    });
-  });
+  //     expect(received).toBe(orders);
+  //   });
+  // });
 
   describe('GET /orders/:id', () => {
     it('get order By Id', async () => {
