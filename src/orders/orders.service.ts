@@ -89,13 +89,13 @@ export class OrdersService {
     const testPayload = JSON.stringify({
       title: `주문이 접수 되었습니다.`,
       badge: 'https://pocketrestaurant.net/favicon.ico',
-      body: 'Notification Body',
+      body: '매장에서 주문확인 중입니다.',
       tag: 'Notification Tag',
       requireInteraction: true,
     });
 
     try {
-      const result = await sendNotification(token, testPayload);
+      await sendNotification(token, testPayload);
     } catch (error) {
       console.log(error);
     }
@@ -109,7 +109,7 @@ export class OrdersService {
       requireInteraction: true,
     });
     try {
-      const result = await sendNotification(token, payload);
+      await sendNotification(token, payload);
     } catch (error) {
       console.log(error);
     }

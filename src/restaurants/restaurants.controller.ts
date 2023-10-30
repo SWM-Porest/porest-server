@@ -20,6 +20,7 @@ import { FileFieldsInterceptor } from '@nestjs/platform-express';
 import { Restaurant } from './schemas/restaurants.schema';
 import {
   ApiBasicAuth,
+  ApiBearerAuth,
   ApiBody,
   ApiConsumes,
   ApiCreatedResponse,
@@ -29,9 +30,14 @@ import {
   ApiTags,
 } from '@nestjs/swagger';
 import { Http } from 'winston/lib/winston/transports';
+import { JwtAuthGuard } from 'src/auth/guard/jwt-auth.guard';
+import { RolesGuard } from 'src/auth/guard/roles.guard';
+import { Roles } from 'src/auth/decorator/roles.decorator';
+import { UserRole } from 'src/auth/schemas/user.schema';
 
 @Controller('restaurants')
 @ApiTags('매장 API')
+@UseGuards(JwtAuthGuard, RolesGuard)
 export class RestaurantsController {
   constructor(private readonly restaurantService: RestaurantsService) {}
 
@@ -64,7 +70,6 @@ export class RestaurantsController {
     summary: '매장 생성',
     description: '매장을 생성합니다.',
   })
-  @ApiBasicAuth()
   @ApiConsumes('multipart/form-data')
   @ApiBody({
     description: '매장 생성 정보',
@@ -130,7 +135,8 @@ export class RestaurantsController {
     description: '매장 생성 성공',
     type: Restaurant,
   })
-  @UseGuards(AuthGuard('basic'))
+  @ApiBearerAuth('access-token')
+  @Roles(UserRole.RESTAURANT_MANAGER)
   @UseInterceptors(FileFieldsInterceptor([{ name: 'image', maxCount: 10 }]))
   @Post()
   async createRestaurant(@Body() data: any, @UploadedFiles() files: Express.Multer.File[]): Promise<Restaurant> {
@@ -148,7 +154,8 @@ export class RestaurantsController {
     description: '매장 수정 정보',
     type: UpdateRestaurantsDto,
   })
-  @UseGuards(AuthGuard('basic'))
+  @ApiBearerAuth('access-token')
+  @Roles(UserRole.RESTAURANT_MANAGER)
   @Patch(':id')
   async updateRestaurant(
     @Param('id') id: string,
@@ -161,8 +168,9 @@ export class RestaurantsController {
     summary: '매장 배너 이미지 추가',
     description: '매장 배너 이미지를 추가합니다.',
   })
+  @ApiBearerAuth('access-token')
+  @Roles(UserRole.RESTAURANT_MANAGER)
   @UseInterceptors(FileFieldsInterceptor([{ name: 'image', maxCount: 6 }]))
-  @UseGuards(AuthGuard('basic'))
   @Patch(':id/images')
   async uploadRestaurantBannerImage(@Param('id') _id: string, @UploadedFiles() files: Express.Multer.File[]) {
     return await this.restaurantService.addRestaurantBannerImage(_id, files);
@@ -172,6 +180,8 @@ export class RestaurantsController {
     summary: '매장 메뉴 이미지 추가',
     description: '매장 메뉴 이미지를 추가합니다.',
   })
+  @ApiBearerAuth('access-token')
+  @Roles(UserRole.RESTAURANT_MANAGER)
   @UseInterceptors(FileFieldsInterceptor([{ name: 'image', maxCount: 1 }]))
   @Patch(':id/menus/images')
   async uploadMenuImage(@Param('id') _id: string, @UploadedFiles() files: Express.Multer.File[]) {
@@ -182,7 +192,8 @@ export class RestaurantsController {
     summary: '매장 배너 이미지 삭제',
     description: '매장 배너 이미지를 삭제합니다.',
   })
-  @UseGuards(AuthGuard('basic'))
+  @ApiBearerAuth('access-token')
+  @Roles(UserRole.RESTAURANT_MANAGER)
   @Delete(':id/images/:imageId')
   async deleteImage(@Param('id') id: string, @Param('imageId') imageName: string) {
     return await this.restaurantService.deleteImage(id, imageName);
@@ -197,6 +208,8 @@ export class RestaurantsController {
     type: CreateMenusDto,
   })
   @ApiResponse({ status: HttpStatus.CREATED, description: '매장 메뉴 추가 성공', type: Restaurant })
+  @ApiBearerAuth('access-token')
+  @Roles(UserRole.RESTAURANT_MANAGER)
   @Post(':id/menus')
   async addMenu(@Param('id') id: string, @Body() createMenusDto: CreateMenusDto) {
     return await this.restaurantService.addMenu(id, createMenusDto);
@@ -211,6 +224,8 @@ export class RestaurantsController {
     type: UpdateMenusDto,
   })
   @ApiResponse({ status: HttpStatus.OK, description: '매장 메뉴 수정 성공', type: Restaurant })
+  @ApiBearerAuth('access-token')
+  @Roles(UserRole.RESTAURANT_MANAGER)
   @Patch(':id/menus')
   async updateMenu(@Param('id') id: string, @Body() updateMenusDto: UpdateMenusDto) {
     return await this.restaurantService.updateMenu(id, updateMenusDto);
@@ -221,7 +236,8 @@ export class RestaurantsController {
     description: '매장 메뉴를 삭제합니다.',
   })
   @ApiResponse({ status: HttpStatus.OK, description: '매장 메뉴 삭제 성공', type: Restaurant })
-  @Delete(':id/menus/:menuId')
+  @ApiBearerAuth('access-token')
+  @Roles(UserRole.RESTAURANT_MANAGER)
   async deleteMenu(@Param('id') id: string, @Param('menuId') menuId: string) {
     return await this.restaurantService.deleteMenu(id, menuId);
   }
@@ -231,7 +247,8 @@ export class RestaurantsController {
     description: '매장을 삭제합니다.',
   })
   @ApiResponse({ status: HttpStatus.OK, description: '매장 삭제 성공', type: String })
-  @UseGuards(AuthGuard('basic'))
+  @ApiBearerAuth('access-token')
+  @Roles(UserRole.ADMIN)
   @Delete(':id')
   async remove(@Param('id') id: string) {
     return this.restaurantService.remove(id);
@@ -246,7 +263,8 @@ export class RestaurantsController {
     description: '매장 메뉴 옵션 추가 정보',
     type: CreateMenuOptionsDto,
   })
-  @UseGuards(AuthGuard('basic'))
+  @ApiBearerAuth('access-token')
+  @Roles(UserRole.RESTAURANT_MANAGER)
   @Post(':id/menus/:menuId/options')
   async addMenuOption(@Param('id') id: string, @Param('menuId') menuId: string, @Body() data: any) {
     const createMenuOptionsDto: CreateMenuOptionsDto = JSON.parse(data.createMenuOptionsDto);
@@ -262,7 +280,8 @@ export class RestaurantsController {
     description: '매장 메뉴 옵션 수정 정보',
     type: UpdateMenuOptionsDto,
   })
-  @UseGuards(AuthGuard('basic'))
+  @ApiBearerAuth('access-token')
+  @Roles(UserRole.RESTAURANT_MANAGER)
   @Patch(':id/menus/:menuId/options')
   async updateMenuOption(@Param('id') id: string, @Param('menuId') menuId: string, @Body() data: any) {
     const updateMenuOptionsDto: UpdateMenuOptionsDto = JSON.parse(data.updateMenuOptionsDto);
@@ -274,7 +293,8 @@ export class RestaurantsController {
     description: '매장 메뉴 옵션을 삭제합니다.',
   })
   @ApiResponse({ status: HttpStatus.OK, description: '매장 메뉴 옵션 삭제 성공', type: Restaurant })
-  @UseGuards(AuthGuard('basic'))
+  @ApiBearerAuth('access-token')
+  @Roles(UserRole.RESTAURANT_MANAGER)
   @Delete(':id/menus/:menuId/options/:optionId')
   async deleteMenuOption(
     @Param('id') id: string,
@@ -289,6 +309,8 @@ export class RestaurantsController {
     description: '매장 카테고리를 추가합니다.',
   })
   @ApiResponse({ status: HttpStatus.CREATED, description: '매장 카테고리 추가 성공', type: Restaurant })
+  @ApiBearerAuth('access-token')
+  @Roles(UserRole.RESTAURANT_MANAGER)
   @Post(':id/categories')
   async addCategory(@Param('id') id: string, @Query('category') category: string) {
     return await this.restaurantService.addCategory(id, category);
