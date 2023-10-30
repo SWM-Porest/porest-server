@@ -238,6 +238,7 @@ export class RestaurantsController {
   @ApiResponse({ status: HttpStatus.OK, description: '매장 메뉴 삭제 성공', type: Restaurant })
   @ApiBearerAuth('access-token')
   @Roles(UserRole.RESTAURANT_MANAGER)
+  @Delete(':id/menus/:menuId')
   async deleteMenu(@Param('id') id: string, @Param('menuId') menuId: string) {
     return await this.restaurantService.deleteMenu(id, menuId);
   }
