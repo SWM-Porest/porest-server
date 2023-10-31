@@ -85,6 +85,10 @@ export class RestaurantRepository {
     const menu: CreateMenusDto = new this.menuModel(createMenusDto);
     menu._id = new Types.ObjectId();
 
+    for (const option of menu.menuOptions) {
+      option._id = new Types.ObjectId();
+    }
+
     return await this.restaurantModel.findByIdAndUpdate(
       new Types.ObjectId(_id),
       { $push: { menus: menu } },
@@ -94,6 +98,10 @@ export class RestaurantRepository {
 
   async updateMenu(_id: string, updateMenusDto: UpdateMenusDto): Promise<Restaurant> {
     updateMenusDto._id = new Types.ObjectId(updateMenusDto._id);
+
+    for (const option of updateMenusDto.menuOptions) {
+      if (!option._id) option._id = new Types.ObjectId(option._id);
+    }
 
     return await this.restaurantModel
       .findOneAndUpdate(
