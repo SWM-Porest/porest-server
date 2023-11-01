@@ -51,7 +51,8 @@ export class OrdersRepository {
       .skip(startIndex)
       .limit(endIndex)
       .exec();
-    return { orders, page, pageSize, sort };
+    const totalCount = await this.Order.countDocuments({ user_id: id }).exec();
+    return { orders, page, pageSize, sort, totalCount };
   }
 
   async getRestauarntOrdersByDate(id: string): Promise<Order[]> {

@@ -17,4 +17,8 @@ export class GetOrdersByUserDto {
   @ApiProperty({ example: 1, description: '정렬 방식 0: 최신순 1: 오래된순', required: true })
   @IsNotEmpty()
   sort: number;
+
+  @ApiProperty({ example: 10, description: '전체 주문의 개수', required: true })
+  @IsNotEmpty()
+  totalCount: number;
 }
