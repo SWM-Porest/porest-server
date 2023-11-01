@@ -28,6 +28,11 @@ export class WaitingsController {
   @Roles(UserRole.USER)
   @Post()
   async create(@Req() req: any, @Body() createWaitingDto: CreateWaitingDto) {
+    const token = createWaitingDto?.token;
+    console.log(token);
+    if (token) {
+      await this.waitingsService.notifyCreateWaiting(token);
+    }
     return await this.waitingsService.create(createWaitingDto, req.user);
   }
 
