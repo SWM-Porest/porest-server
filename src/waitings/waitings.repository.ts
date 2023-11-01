@@ -70,6 +70,19 @@ export class WaitingsRepository {
     return waitingTeam;
   }
 
+  async getWaitingTeamStand(restaurantId: string, waitingId: string): Promise<number> {
+    const waitingList = await this.waitingsModel
+      .find({
+        restaurant_id: restaurantId,
+        status: { $lte: WaitingStatus.CALL },
+      })
+      .sort({ status: -1, created_at: 1 })
+      .select('id')
+      .exec();
+    const index = waitingList.findIndex((waiting) => waiting.id === waitingId) + 1;
+    return index;
+  }
+
   async updateWaitingTeam(restaurantId: string, updateWaiting: number): Promise<WaitingTeam> {
     const waitingTeam: WaitingTeam = await this.waitingTeamsModel
       .findOneAndUpdate(

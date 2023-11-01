@@ -4,7 +4,6 @@ import { WaitingsRepository } from './waitings.repository';
 import { RestaurantsService } from 'src/restaurants/restaurants.service';
 import { Waiting, WaitingStatus, WaitingTeam } from './schemas/waiting.schema';
 import { RequestUserDto } from 'src/auth/dto/requestUser.dto';
-import { Types } from 'mongoose';
 
 @Injectable()
 export class WaitingsService {
@@ -95,6 +94,10 @@ export class WaitingsService {
 
   async getWaitingTeam(restaurantId: string): Promise<WaitingTeam> {
     return await this.waitingsRepository.getWaitingTeam(restaurantId);
+  }
+
+  async getWaitingTeamStand(restaurantId: string, waitingId: string): Promise<number> {
+    return await this.waitingsRepository.getWaitingTeamStand(restaurantId, waitingId);
   }
 
   async updateWaitingTeam(restaurantId: string, updateNumber: number): Promise<WaitingTeam> {

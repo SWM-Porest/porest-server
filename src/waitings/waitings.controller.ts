@@ -35,10 +35,22 @@ export class WaitingsController {
     summary: '매장 대기팀 수 조회',
     description: '매장의 대기 중인 팀의 수를 조회하는 API입니다.',
   })
+  @ApiBearerAuth('access-token')
   @Roles(UserRole.GUEST)
   @Get(':restaurantId/team')
   async getWaitingTeam(@Param('restaurantId') restaurantId: string) {
     return await this.waitingsService.getWaitingTeam(restaurantId);
+  }
+
+  @ApiOperation({
+    summary: '매장 대기팀 순번 조회',
+    description: '매장의 대기 중인 팀의 순번을 조회하는 API입니다.',
+  })
+  @ApiBearerAuth('access-token')
+  @Roles(UserRole.USER)
+  @Get(':restaurantId/team/:waitingId')
+  async getWaitingTeamStand(@Param('restaurantId') restaurantId: string, @Param('waitingId') waitingId: string) {
+    return await this.waitingsService.getWaitingTeamStand(restaurantId, waitingId);
   }
 
   @ApiOperation({
