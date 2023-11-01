@@ -5,8 +5,10 @@ import { RestaurantsModule } from './restaurants/restaurants.module';
 import { MongooseModule } from '@nestjs/mongoose';
 import { ConfigModule } from '@nestjs/config';
 import * as Joi from 'joi';
-import { LoggerMiddleware } from './logger/logger.middleware';
 import { AuthModule } from './auth/auth.module';
+import { OrdersModule } from './orders/orders.module';
+import { WaitingsModule } from './waitings/waitings.module';
+import { TablesModule } from './tables/tables.module';
 
 @Module({
   imports: [
@@ -22,12 +24,11 @@ import { AuthModule } from './auth/auth.module';
     RestaurantsModule,
     MongooseModule.forRoot(process.env.MONGO_URI),
     AuthModule,
+    OrdersModule,
+    WaitingsModule,
+    TablesModule,
   ],
   controllers: [AppController],
   providers: [AppService],
 })
-export class AppModule implements NestModule {
-  configure(consumer: MiddlewareConsumer) {
-    consumer.apply(LoggerMiddleware).forRoutes('*');
-  }
-}
+export class AppModule {}
