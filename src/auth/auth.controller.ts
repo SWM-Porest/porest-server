@@ -44,9 +44,13 @@ export class AuthController {
   @Get('kakao/callback')
   async kakaocallback(@Req() req, @Res() res: Response) {
     if (req.user.type === 'login') {
-      res.cookie('access_token', req.user.access_token, { expires: new Date(Date.now() + 1000 * 60 * 60 * 24 * 7) });
+      res.cookie('access_token', req.user.access_token, {
+        expires: new Date(Date.now() + 1000 * 60 * 60 * 24 * 7),
+        domain: process.env.COOKIE_DOMAIN,
+      });
       res.cookie('refresh_token', req.user.refresh_token, {
         expires: new Date(Date.now() + 1000 * 60 * 60 * 24 * 90),
+        domain: process.env.COOKIE_DOMAIN,
         httpOnly: true,
       });
     }
@@ -58,7 +62,7 @@ export class AuthController {
   @ApiBearerAuth('access-token')
   @ApiOperation({
     summary: '회원가입',
-    description: '회원가입 하는 API입니다.',
+    description: '회원가입 하 API입니다.',
   })
   @ApiResponse({
     status: 201,
