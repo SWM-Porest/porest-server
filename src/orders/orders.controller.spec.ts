@@ -134,6 +134,7 @@ describe('OrdersController', () => {
         page: 1,
         pageSize: 10,
         sort: 0,
+        totalCount: 0,
       };
       jest.spyOn(ordersService, 'getOrdersByUser').mockImplementation(() => Promise.resolve(getOrders));
       const request = {
