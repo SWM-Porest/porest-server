@@ -73,6 +73,9 @@ export class Menu {
   @Prop()
   description: string;
 
+  @Prop()
+  ingre: string[];
+
   @Prop({ type: Object })
   img: Image;
 
