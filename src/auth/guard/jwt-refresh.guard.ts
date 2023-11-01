@@ -23,6 +23,7 @@ export class JwtRefreshGuard extends AuthGuard('jwt') {
 
     response.cookie('access_token', refreshTokenValidate, {
       expires: new Date(Date.now() + 1000 * 60 * 60 * 24 * 7),
+      domain: process.env.COOKIE_DOMAIN,
     });
     response.setHeader('access_token', refreshTokenValidate);
     response.setHeader('tokenReissue', true);
