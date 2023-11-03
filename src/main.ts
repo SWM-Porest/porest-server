@@ -4,7 +4,7 @@ import { DocumentBuilder, SwaggerCustomOptions, SwaggerModule } from '@nestjs/sw
 import { NestExpressApplication } from '@nestjs/platform-express';
 import { ValidationPipe } from '@nestjs/common';
 import * as cookieParser from 'cookie-parser';
-import { setVapidDetails } from 'web-push';
+import { setGCMAPIKey, setVapidDetails } from 'web-push';
 
 async function bootstrap() {
   if (process.on) {
