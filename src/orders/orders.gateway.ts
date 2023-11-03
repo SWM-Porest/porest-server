@@ -9,7 +9,7 @@ const MSG = {
 @WebSocketGateway({
   namespace: 'orders',
   cors: {
-    origin: '*',
+    origin: process.env.SOCKET_ORIGIN,
   },
 })
 export class OrdersGateway implements OnModuleInit {
