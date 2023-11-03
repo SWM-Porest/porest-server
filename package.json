@@ -31,6 +31,8 @@
     "@nestjs/platform-socket.io": "^10.2.4",
     "@nestjs/swagger": "^7.1.4",
     "@nestjs/websockets": "^10.2.4",
+    "@sentry/node": "^7.77.0",
+    "@sentry/profiling-node": "^1.2.6",
     "@types/bcryptjs": "^2.4.2",
     "@types/cookie-parser": "^1.4.4",
     "@types/passport-kakao": "^1.0.0",

@@ -6,6 +6,19 @@ import { ValidationPipe } from '@nestjs/common';
 import * as cookieParser from 'cookie-parser';
 import { setVapidDetails } from 'web-push';
 
+import * as Sentry from '@sentry/node';
+import { ProfilingIntegration } from '@sentry/profiling-node';
+
+if (process.env.NODE_ENV === 'prod') {
+  Sentry.init({
+    dsn: 'https://975505567072cb58966e66874522e577@o4506160981737472.ingest.sentry.io/4506160990519296',
+    integrations: [new ProfilingIntegration()],
+    // Performance Monitoring
+    tracesSampleRate: 1.0,
+    // Set sampling rate for profiling - this is relative to tracesSampleRate
+    profilesSampleRate: 1.0,
+  });
+}
 async function bootstrap() {
   if (process.on) {
     process.on('SIGINT', () => {
@@ -54,4 +67,5 @@ async function bootstrap() {
     }
   });
 }
+
 bootstrap();
