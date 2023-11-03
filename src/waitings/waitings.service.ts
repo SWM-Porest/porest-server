@@ -4,6 +4,8 @@ import { WaitingsRepository } from './waitings.repository';
 import { RestaurantsService } from 'src/restaurants/restaurants.service';
 import { Waiting, WaitingStatus, WaitingTeam } from './schemas/waiting.schema';
 import { RequestUserDto } from 'src/auth/dto/requestUser.dto';
+import { PushSubscriptionDto } from 'src/orders/dto/pushSubscription.dto';
+import { sendNotification } from 'web-push';
 
 @Injectable()
 export class WaitingsService {
@@ -78,6 +80,9 @@ export class WaitingsService {
     waiting.status = 2;
     await this.waitingsRepository.updateWaitingTeam(waiting.restaurant_id, -1);
 
+    if (waiting.token) {
+      await this.notifycallWaiting(waiting.token);
+    }
     return await this.waitingsRepository.update(waiting);
   }
 
@@ -102,5 +107,36 @@ export class WaitingsService {
 
   async updateWaitingTeam(restaurantId: string, updateNumber: number): Promise<WaitingTeam> {
     return await this.waitingsRepository.updateWaitingTeam(restaurantId, updateNumber);
+  }
+
+  async notifyCreateWaiting(token: PushSubscriptionDto) {
+    // payload는 인자로 받아서 처리해야함, 현재는 테스트용
+    const testPayload = JSON.stringify({
+      title: `대기열이 등록 되었습니다.`,
+      badge: 'https://pocketrestaurant.net/favicon.ico',
+      body: '매장에 늦지않게 방문 부탁드립니다.',
+      tag: 'Notification Tag',
+      requireInteraction: true,
+    });
+
+    try {
+      await sendNotification(token, testPayload);
+    } catch (error) {
+      console.log(error);
+    }
+  }
+
+  async notifycallWaiting(token: PushSubscriptionDto) {
+    const payload = JSON.stringify({
+      title: `지금 매장으로 입장해주세요.`,
+      body: '5분동안 미입장 시, 자동 취소됩니다.',
+      tag: 'Notification Tag',
+      requireInteraction: true,
+    });
+    try {
+      await sendNotification(token, payload);
+    } catch (error) {
+      console.log(error);
+    }
   }
 }
