@@ -21,7 +21,6 @@ export class OrdersService {
   ) {}
 
   async createOrder(createOrdersDto: CreateOrdersDto): Promise<Order> {
-    createOrdersDto.status_updated_at = { 1: new Date() };
     // 메뉴가격, 옵션가격 검증돌리기. 이름 없으면 주문에러뱉기
     const order = await this.ordersRepository.createOrder(createOrdersDto);
 
