@@ -11,6 +11,8 @@ export class OrdersRepository {
   constructor(@InjectModel('Orders') private readonly Order: Model<Order>) {}
 
   async createOrder(createOrdersDto: CreateOrdersDto): Promise<Order> {
+    createOrdersDto.status_updated_at = { 1: new Date() };
+
     return await this.Order.create(createOrdersDto);
   }
 
@@ -32,7 +34,13 @@ export class OrdersRepository {
   }
 
   async updateOrderStatus(id: Types.ObjectId, status: number): Promise<Order> {
-    return await this.Order.findByIdAndUpdate({ _id: id }, { status }, { new: true });
+    const order = await this.getOrder(id);
+    order.status_updated_at[status] = new Date();
+    return await this.Order.findByIdAndUpdate(
+      { _id: id },
+      { status_updated_at: { ...order.status_updated_at }, status },
+      { new: true },
+    );
   }
 
   async getOrder(_id: Types.ObjectId): Promise<Order> {
