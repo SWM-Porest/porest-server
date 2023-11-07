@@ -4,7 +4,7 @@ import { DocumentBuilder, SwaggerCustomOptions, SwaggerModule } from '@nestjs/sw
 import { NestExpressApplication } from '@nestjs/platform-express';
 import { ValidationPipe } from '@nestjs/common';
 import * as cookieParser from 'cookie-parser';
-import { setGCMAPIKey, setVapidDetails } from 'web-push';
+import admin from 'firebase-admin';
 
 async function bootstrap() {
   if (process.on) {
@@ -46,8 +46,10 @@ async function bootstrap() {
   const document = SwaggerModule.createDocument(app, config);
   SwaggerModule.setup('api', app, document, swaggerOptions);
 
-  setGCMAPIKey(process.env.GCM_API_KEY);
-  setVapidDetails('https://api.pocketrestaurant.net', process.env.VAPID_PUBLIC_KEY, process.env.VAPID_PRIVATE_KEY);
+  const firebaseCredentials = JSON.parse(process.env.FIREBASE_CREDENTIAL_JSON);
+  admin.initializeApp({
+    credential: admin.credential.cert(firebaseCredentials),
+  });
 
   await app.listen(process.env.PORT, () => {
     if (process.send) {

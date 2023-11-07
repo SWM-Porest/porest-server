@@ -118,9 +118,7 @@ export class WaitingsController {
   @Roles(UserRole.USER)
   @Patch(':waitingId/managercancel')
   async cancelWaiting(@Req() req: any, @Param('waitingId') waitingId: string) {
-    const waiting: Waiting = await this.waitingsService.findOneActive(waitingId, WaitingStatus.SEATED);
-    await this.waitingsService.validateRestaurant(waiting.restaurant_id, req.user.restaurantsId);
-    return await this.waitingsService.cancelWaiting(waiting, req.user.userNick);
+    return await this.waitingsService.cancelManagerWaiting(waitingId, req.user.userNick);
   }
 
   @ApiOperation({
