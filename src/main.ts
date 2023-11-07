@@ -47,7 +47,7 @@ async function bootstrap() {
   SwaggerModule.setup('api', app, document, swaggerOptions);
 
   setGCMAPIKey(process.env.GCM_API_KEY);
-  setVapidDetails('https://pocketrestaurant.net', process.env.VAPID_PUBLIC_KEY, process.env.VAPID_PRIVATE_KEY);
+  setVapidDetails('https://api.pocketrestaurant.net', process.env.VAPID_PUBLIC_KEY, process.env.VAPID_PRIVATE_KEY);
 
   await app.listen(process.env.PORT, () => {
     if (process.send) {

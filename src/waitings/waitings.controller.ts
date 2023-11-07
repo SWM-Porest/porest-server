@@ -28,11 +28,6 @@ export class WaitingsController {
   @Roles(UserRole.USER)
   @Post()
   async create(@Req() req: any, @Body() createWaitingDto: CreateWaitingDto) {
-    const token = createWaitingDto?.token;
-    console.log(token);
-    if (token) {
-      await this.waitingsService.notifyCreateWaiting(token);
-    }
     return await this.waitingsService.create(createWaitingDto, req.user);
   }
 
@@ -90,7 +85,7 @@ export class WaitingsController {
   @Roles(UserRole.USER)
   @Get(':restaurantId')
   async findOne(@Req() req: any, @Param('restaurantId') restaurantId: string) {
-    return await this.waitingsService.findUniqueActive(req.user.userId, restaurantId, WaitingStatus.SEATED);
+    return await this.waitingsService.findUniqueActive(req.user.userId, restaurantId, WaitingStatus.CALL);
   }
 
   @ApiOperation({
