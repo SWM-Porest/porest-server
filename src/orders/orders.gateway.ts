@@ -1,5 +1,5 @@
 import { OnModuleInit } from '@nestjs/common';
-import { WebSocketGateway, WebSocketServer } from '@nestjs/websockets';
+import { OnGatewayDisconnect, WebSocketGateway, WebSocketServer } from '@nestjs/websockets';
 import { Server } from 'socket.io';
 
 const MSG = {
@@ -12,14 +12,14 @@ const MSG = {
     origin: process.env.SOCKET_ORIGIN,
   },
 })
-export class OrdersGateway implements OnModuleInit {
+export class OrdersGateway implements OnModuleInit, OnGatewayDisconnect {
   @WebSocketServer()
   server: Server;
 
   onModuleInit() {
     this.server.on('connection', (socket) => {
-      console.log(socket.id);
-      console.log('Connected');
+      // console.log(socket.id);
+      // console.log('Connected');
     });
   }
 
@@ -32,5 +32,9 @@ export class OrdersGateway implements OnModuleInit {
         content: order,
       });
     }
+  }
+
+  handleDisconnect(client: any) {
+    // console.log('Client disconnected: ', client.id);
   }
 }

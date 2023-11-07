@@ -43,3 +43,5 @@ lerna-debug.log*
 
 uploads
 uploads/*
+# Sentry Config File
+.sentryclirc
