@@ -1,7 +1,6 @@
 import { Prop, Schema, SchemaFactory } from '@nestjs/mongoose';
 import { ApiProperty } from '@nestjs/swagger';
 import { Types } from 'mongoose';
-import { PushSubscription } from 'src/orders/schemas/orders.schema';
 
 @Schema()
 export class Waiting {
@@ -74,7 +73,7 @@ export class Waiting {
   updated_at: Date;
 
   @Prop()
-  token: PushSubscription;
+  token: string;
 }
 
 export const WaitingSchema = SchemaFactory.createForClass(Waiting);
@@ -135,6 +134,12 @@ export class WaitingTeam {
   })
   @Prop()
   updated_at: Date;
+}
+
+export interface pushPayload {
+  title?: string;
+  body?: string;
+  imageUrl?: string;
 }
 
 export const WaitingTeamSchema = SchemaFactory.createForClass(WaitingTeam);
