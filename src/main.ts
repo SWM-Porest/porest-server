@@ -64,7 +64,7 @@ async function bootstrap() {
   const document = SwaggerModule.createDocument(app, config);
   SwaggerModule.setup('api', app, document, swaggerOptions);
 
-  const firebaseCredentials = JSON.parse(process.env.FIREBASE_CREDENTIAL_JSON);
+  const firebaseCredentials = process.env.FIREBASE_CREDENTIAL_JSON;
   admin.initializeApp({
     credential: admin.credential.cert(firebaseCredentials),
   });
