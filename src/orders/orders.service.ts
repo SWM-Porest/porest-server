@@ -7,9 +7,10 @@ import { Types, isValidObjectId } from 'mongoose';
 import { UsersService } from 'src/auth/user.service';
 import { GetOrdersByUserDto } from './dto/getOrdersByUser.dto';
 import { OrdersGateway } from './orders.gateway';
-import { sendNotification } from 'web-push';
-import { OrderStatusMessage, PushSubscriptionDto } from './dto/pushSubscription.dto';
+import { OrderStatusMessage } from './dto/pushSubscription.dto';
 import { RestaurantsService } from 'src/restaurants/restaurants.service';
+import { pushPayload } from 'src/waitings/schemas/waiting.schema';
+import firebase from 'firebase-admin';
 
 @Injectable()
 export class OrdersService {
@@ -80,34 +81,15 @@ export class OrdersService {
     throw new UnauthorizedException('해당 요청에 대한 권한이 없습니다.');
   }
 
-  async notifyCreateOrder(token: string) {
-    // payload는 인자로 받아서 처리해야함, 현재는 테스트용
-    const testPayload = JSON.stringify({
-      title: `주문이 접수 되었습니다.`,
-      badge: 'https://pocketrestaurant.net/favicon.ico',
-      body: '매장에서 주문확인 중입니다.',
-      tag: 'Notification Tag',
-      requireInteraction: true,
-    });
-
-    try {
-      // await sendNotification(token, testPayload);
-    } catch (error) {
-      console.log(error);
-    }
-  }
-
-  async notifyUpdateOrder(token: string, status: number) {
-    const payload = JSON.stringify({
-      title: `주문의 상태가 변경되었습니다.`,
-      body: `${status as OrderStatusMessage}`,
-      tag: 'Notification Tag',
-      requireInteraction: true,
-    });
-    try {
-      // await sendNotification(token, payload);
-    } catch (error) {
-      console.log(error);
-    }
+  async notifyOrder(token: string, payload: pushPayload) {
+    await firebase
+      .messaging()
+      .send({
+        notification: payload,
+        token: token,
+      })
+      .catch((err) => {
+        return err;
+      });
   }
 }
