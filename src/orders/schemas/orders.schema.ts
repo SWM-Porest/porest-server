@@ -7,20 +7,6 @@ export class StatusUpdatedAt {
   [key: number]: Date;
 }
 
-class Keys {
-  auth: string;
-
-  p256dh: string;
-}
-
-export class PushSubscription {
-  endpoint: string;
-
-  keys: Keys;
-
-  expirationTime: number | null;
-}
-
 export class OrderMenudetail {
   menu_name: string;
   price: number;
@@ -71,7 +57,7 @@ export class Order {
   updated_at: Date;
 
   @Prop()
-  token: PushSubscription;
+  token: string;
 }
 export const OrderSchema = SchemaFactory.createForClass(Order);
 

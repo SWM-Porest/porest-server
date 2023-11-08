@@ -15,5 +15,5 @@ export class CreateWaitingDto {
   @IsNotEmpty()
   head_count: number;
 
-  token?: PushSubscriptionDto = null;
+  token?: string = null;
 }
