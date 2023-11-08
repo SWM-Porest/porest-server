@@ -34,5 +34,5 @@ export class CreateOrdersDto {
     description: '유저의 푸시 알림 구독 정보',
     required: false,
   })
-  token?: PushSubscriptionDto = null;
+  token?: string = null;
 }

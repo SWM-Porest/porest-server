@@ -28,11 +28,6 @@ export class WaitingsController {
   @Roles(UserRole.USER)
   @Post()
   async create(@Req() req: any, @Body() createWaitingDto: CreateWaitingDto) {
-    const token = createWaitingDto?.token;
-    console.log(token);
-    if (token) {
-      await this.waitingsService.notifyCreateWaiting(token);
-    }
     return await this.waitingsService.create(createWaitingDto, req.user);
   }
 
@@ -90,7 +85,7 @@ export class WaitingsController {
   @Roles(UserRole.USER)
   @Get(':restaurantId')
   async findOne(@Req() req: any, @Param('restaurantId') restaurantId: string) {
-    return await this.waitingsService.findUniqueActive(req.user.userId, restaurantId, WaitingStatus.SEATED);
+    return await this.waitingsService.findUniqueActive(req.user.userId, restaurantId, WaitingStatus.CALL);
   }
 
   @ApiOperation({
@@ -123,9 +118,7 @@ export class WaitingsController {
   @Roles(UserRole.USER)
   @Patch(':waitingId/managercancel')
   async cancelWaiting(@Req() req: any, @Param('waitingId') waitingId: string) {
-    const waiting: Waiting = await this.waitingsService.findOneActive(waitingId, WaitingStatus.SEATED);
-    await this.waitingsService.validateRestaurant(waiting.restaurant_id, req.user.restaurantsId);
-    return await this.waitingsService.cancelWaiting(waiting, req.user.userNick);
+    return await this.waitingsService.cancelManagerWaiting(waitingId, req.user.userNick);
   }
 
   @ApiOperation({

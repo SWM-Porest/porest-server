@@ -21,7 +21,6 @@ export class OrdersService {
   ) {}
 
   async createOrder(createOrdersDto: CreateOrdersDto): Promise<Order> {
-    createOrdersDto.status_updated_at = { 1: new Date() };
     // 메뉴가격, 옵션가격 검증돌리기. 이름 없으면 주문에러뱉기
     const order = await this.ordersRepository.createOrder(createOrdersDto);
 
@@ -81,7 +80,7 @@ export class OrdersService {
     throw new UnauthorizedException('해당 요청에 대한 권한이 없습니다.');
   }
 
-  async notifyCreateOrder(token: PushSubscriptionDto) {
+  async notifyCreateOrder(token: string) {
     // payload는 인자로 받아서 처리해야함, 현재는 테스트용
     const testPayload = JSON.stringify({
       title: `주문이 접수 되었습니다.`,
@@ -92,13 +91,13 @@ export class OrdersService {
     });
 
     try {
-      await sendNotification(token, testPayload);
+      // await sendNotification(token, testPayload);
     } catch (error) {
       console.log(error);
     }
   }
 
-  async notifyUpdateOrder(token: PushSubscriptionDto, status: number) {
+  async notifyUpdateOrder(token: string, status: number) {
     const payload = JSON.stringify({
       title: `주문의 상태가 변경되었습니다.`,
       body: `${status as OrderStatusMessage}`,
@@ -106,7 +105,7 @@ export class OrdersService {
       requireInteraction: true,
     });
     try {
-      await sendNotification(token, payload);
+      // await sendNotification(token, payload);
     } catch (error) {
       console.log(error);
     }
