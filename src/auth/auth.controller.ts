@@ -90,6 +90,38 @@ export class AuthController {
     return false;
   }
 
+  @ApiBearerAuth('access-token')
+  @ApiOperation({
+    summary: '로그아웃',
+    description: '로그아웃 하는 API입니다.',
+  })
+  @ApiResponse({
+    status: 201,
+    description: '정상 요청',
+  })
+  @ApiBadRequestResponse({
+    status: 400,
+    description: '잘못된 정보 요청',
+  })
+  @ApiUnauthorizedResponse({
+    status: 401,
+    description: '토큰 에러',
+  })
+  @Roles(UserRole.USER)
+  @UseGuards(JwtAuthGuard, RolesGuard)
+  @Post('logout')
+  async logout(@Req() req: any, @Res() res: Response) {
+    try {
+      res.clearCookie('access_token', { domain: process.env.COOKIE_DOMAIN });
+      res.clearCookie('refresh_token', { domain: process.env.COOKIE_DOMAIN });
+      res.json({ success: true, message: 'logout success' });
+    } catch (error) {
+      console.log(error);
+    }
+    // 그 외의 경우
+    return false;
+  }
+
   // secure된 토큰값 클라이언트 전달
   @ApiBearerAuth('refresh-token')
   @ApiOperation({

@@ -45,3 +45,6 @@ uploads
 uploads/*
 # Sentry Config File
 .sentryclirc
+
+#CREDENTIAL
+porest_service_account.json
