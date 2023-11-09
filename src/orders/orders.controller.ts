@@ -19,7 +19,7 @@ import { RolesGuard } from 'src/auth/guard/roles.guard';
 import { Order } from './schemas/orders.schema';
 import { GetOrdersByUserDto } from './dto/getOrdersByUser.dto';
 import { sendNotification } from 'web-push';
-import { PushSubscriptionDto } from './dto/pushSubscription.dto';
+import { OrderStatusMessage, PushSubscriptionDto } from './dto/pushSubscription.dto';
 
 @Controller('orders')
 @ApiTags('주문 API')
@@ -44,7 +44,10 @@ export class OrdersController {
     const token = createOrdersDto?.token;
     const data = await this.ordersService.createOrder(createOrdersDto);
     if (token) {
-      await this.ordersService.notifyCreateOrder(token);
+      await this.ordersService.notifyOrder(token, {
+        title: `주문이 접수 되었습니다.`,
+        body: '매장에서 주문확인 중입니다.',
+      });
     }
     return data;
   }
@@ -65,7 +68,10 @@ export class OrdersController {
 
     // 주문 상태가 변경되었을 때, 푸시 알림 전송
     if (updateOrdersDto?.status && updatedOrder?.token) {
-      await this.ordersService.notifyUpdateOrder(updatedOrder.token, updatedOrder.status);
+      await this.ordersService.notifyOrder(updatedOrder.token, {
+        title: `주문의 상태가 변경되었습니다.`,
+        body: `${updateOrdersDto.status as OrderStatusMessage}`,
+      });
     }
     return updatedOrder;
   }
@@ -83,7 +89,15 @@ export class OrdersController {
   @Patch(':id')
   async updateOrderStatus(@Param('id') id: string, @Query('s') s: number): Promise<Order> {
     const objectId = new Types.ObjectId(id);
-    return await this.ordersService.updateOrderStatus(objectId, s);
+    const order: Order = await this.ordersService.updateOrderStatus(objectId, s);
+    const token = order?.token;
+    if (token) {
+      await this.ordersService.notifyOrder(token, {
+        title: `주문의 상태가 변경되었습니다.`,
+        body: `${OrderStatusMessage[s]}`,
+      });
+    }
+    return order;
   }
 
   @ApiOperation({ summary: '주문 삭제', description: '주문을 삭제하는 API입니다.' })
