@@ -18,11 +18,15 @@ export class UsersRepository {
   }
 
   async findByEmail(email: string) {
-    return this.UserModel.findOne({ email }).exec();
+    return await this.UserModel.findOne({ email }).exec();
   }
 
-  async findByKakaoId(id: number) {
+  async findByKakaoId(id: string) {
     return await this.UserModel.findOne({ social_id: id, social_login: 'kakao' }).exec();
+  }
+
+  async findByKakaoIdEmail(id: string, email: string) {
+    return await this.UserModel.findOne({ social_id: id, social_login: 'kakao', email }).exec();
   }
 
   async updateUser(user: RegistUserDTO, id: string) {

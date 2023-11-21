@@ -9,15 +9,19 @@ export class UsersService {
   constructor(private readonly usersRepository: UsersRepository) {}
 
   async findUserByEmail(email: string): Promise<User | undefined> {
-    return this.usersRepository.findByEmail(email);
+    return await this.usersRepository.findByEmail(email);
   }
 
   async findUserById(id: string): Promise<User | undefined> {
-    return this.usersRepository.findById(id);
+    return await this.usersRepository.findById(id);
   }
 
-  async findUserByKakaoId(id: number): Promise<User | undefined> {
+  async findUserByKakaoId(id: string): Promise<User | undefined> {
     return await this.usersRepository.findByKakaoId(id);
+  }
+
+  async findUserByKakaoIdEmail(id: string, email: string): Promise<User | undefined> {
+    return await this.usersRepository.findByKakaoIdEmail(id, email);
   }
 
   async create(user: RegistUserDTO): Promise<User> {

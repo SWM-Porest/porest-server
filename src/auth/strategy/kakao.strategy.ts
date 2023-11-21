@@ -26,7 +26,8 @@ export class KakaoStrategy extends PassportStrategy(Strategy, 'kakao') {
       restaurants_id: [],
     };
     try {
-      const user = await this.authService.validateEmail(user_email);
+      const user = await this.authService.validateKakaoUser(user_profile.social_id, user_profile.email);
+      console.log(user);
       if (user === null) {
         // 유저가 없을때
         const newUser = await this.userService.create(user_profile);

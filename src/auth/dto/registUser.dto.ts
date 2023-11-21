@@ -4,7 +4,7 @@ import { IsEmail, IsEnum, IsNotEmpty, IsNumber, IsOptional, IsString, MaxLength,
 export class RegistUserDTO {
   @ApiProperty({ example: '123456', description: '카카오 고유 ID Number', required: false })
   @IsNumber()
-  social_id: number;
+  social_id: string;
 
   @ApiProperty({ example: 'kakao', description: '소셜 로그인 유형', required: false })
   @IsString()

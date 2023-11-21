@@ -8,7 +8,7 @@ export class UpdateUserDto {
   @IsOptional()
   @ApiProperty({ example: '123456', description: '카카오 고유 ID Number', required: false })
   @IsNumber()
-  social_id: number;
+  social_id: string;
 
   @IsOptional()
   @ApiProperty({ example: 'kakao', description: '소셜 로그인 유형', required: false })

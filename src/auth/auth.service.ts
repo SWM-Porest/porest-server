@@ -8,8 +8,8 @@ import { Types } from 'mongoose';
 export class AuthService {
   constructor(private usersService: UsersService, private jwtService: JwtService) {}
 
-  async validateKakaoUser(user_id: number): Promise<any> {
-    const user = await this.usersService.findUserByKakaoId(user_id);
+  async validateKakaoUser(user_id: string, email: string): Promise<any> {
+    const user = await this.usersService.findUserByKakaoIdEmail(user_id, email);
     if (!user) {
       return null;
     }

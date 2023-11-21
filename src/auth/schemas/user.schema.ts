@@ -8,7 +8,7 @@ export class User {
   userlevel: number;
 
   @Prop({ required: true, unique: true })
-  social_id: number;
+  social_id: string;
 
   @Prop()
   social_login: string;
