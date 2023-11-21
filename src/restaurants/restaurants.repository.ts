@@ -102,7 +102,8 @@ export class RestaurantRepository {
 
     if (updateMenusDto.menuOptions) {
       for (const option of updateMenusDto.menuOptions) {
-        if (!option._id) option._id = new Types.ObjectId(option._id);
+        if (!option._id) option._id = new Types.ObjectId();
+        else option._id = new Types.ObjectId(option._id);
       }
     }
 
