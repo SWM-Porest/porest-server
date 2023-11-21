@@ -146,7 +146,7 @@ export class Restaurant {
   updated_at: Date;
 
   @ApiProperty({ description: '매장 상태' })
-  @Prop()
+  @Prop({ default: 1 })
   status: number;
 
   @ApiProperty({ description: '매장 메뉴' })

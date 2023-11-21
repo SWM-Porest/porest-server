@@ -57,6 +57,10 @@ export class RestaurantsService {
     return this.restaurantRepository.updateRestaurant(_id, updateRestaurantsDto);
   }
 
+  async changeStatus(id: string, status: number) {
+    return this.restaurantRepository.changeStatus(id, status);
+  }
+
   async addRestaurantBannerImage(_id: string, files: Express.Multer.File[]): Promise<Image[]> {
     const new_banner_images = await this.imageUploadService.uploadImage(files['image'], UPLOAD_TYPE.RESTAURANT_BANNER);
     this.restaurantRepository.addRestaurantBannerImage(_id, new_banner_images);

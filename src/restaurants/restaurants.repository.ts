@@ -132,6 +132,14 @@ export class RestaurantRepository {
       .exec();
   }
 
+  async changeStatus(_id: string, status: number): Promise<Restaurant> {
+    return await this.restaurantModel.findByIdAndUpdate(
+      new Types.ObjectId(_id),
+      { $set: { status: status } },
+      { new: true },
+    );
+  }
+
   async updateMenuOption(_id: string, menuId: string, updateMenuOptionDto: UpdateMenuOptionsDto): Promise<Restaurant> {
     return await this.restaurantModel
       .findOneAndUpdate(
