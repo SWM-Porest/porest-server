@@ -118,7 +118,7 @@ export class WaitingsController {
   @Roles(UserRole.USER)
   @Patch(':waitingId/managercancel')
   async cancelWaiting(@Req() req: any, @Param('waitingId') waitingId: string) {
-    return await this.waitingsService.cancelManagerWaiting(waitingId, req.user.userNick);
+    return await this.waitingsService.cancelManagerWaiting(waitingId, req.user);
   }
 
   @ApiOperation({
