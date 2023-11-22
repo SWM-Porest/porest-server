@@ -14,11 +14,11 @@ export class UsersRepository {
 
   async findById(id: string) {
     const _id = new Types.ObjectId(id);
-    return this.UserModel.findById(_id).exec();
+    return await this.UserModel.findById(_id).exec();
   }
 
   async findByEmail(email: string) {
-    return this.UserModel.findOne({ email }).exec();
+    return await this.UserModel.findOne({ email }).exec();
   }
 
   async findByKakaoId(id: number) {
@@ -28,6 +28,6 @@ export class UsersRepository {
   async updateUser(user: RegistUserDTO, id: string) {
     const _id = new Types.ObjectId(id);
     const { ...updateField } = user;
-    return this.UserModel.findOneAndUpdate({ _id }, { $set: updateField }, { new: true }).exec();
+    return await this.UserModel.findOneAndUpdate({ _id }, { $set: updateField }, { new: true }).exec();
   }
 }
