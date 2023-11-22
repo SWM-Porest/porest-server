@@ -249,7 +249,7 @@ export class RestaurantsController {
   async addMenu(@Param('id') id: string, @Body() createMenusDto: CreateMenusDto) {
     const savedRestaurant: Restaurant = await this.cacheManager.get(id);
 
-    const restaurant = this.restaurantService.addMenu(id, createMenusDto);
+    const restaurant = await this.restaurantService.addMenu(id, createMenusDto);
 
     if (savedRestaurant) {
       await this.cacheManager.set(id, restaurant, 60 * 60 * 24);
@@ -373,6 +373,12 @@ export class RestaurantsController {
   @Roles(UserRole.RESTAURANT_MANAGER)
   @Post(':id/categories')
   async addCategory(@Param('id') id: string, @Query('category') category: string) {
-    return await this.restaurantService.addCategory(id, category);
+    const savedRestaurant: Restaurant = await this.cacheManager.get(id);
+
+    const restaurant = await this.restaurantService.addCategory(id, category);
+    if (savedRestaurant) {
+      await this.cacheManager.set(id, restaurant, 60 * 60 * 24);
+    }
+    return restaurant;
   }
 }
