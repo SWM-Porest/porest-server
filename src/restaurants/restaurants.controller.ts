@@ -16,11 +16,9 @@ import {
 import { RestaurantsService } from './restaurants.service';
 import { CreateMenuOptionsDto, CreateMenusDto, CreateRestaurantsDto } from './dto/create-restaurants.dto';
 import { UpdateMenuOptionsDto, UpdateMenusDto, UpdateRestaurantsDto } from './dto/update-restaurants.dto';
-import { AuthGuard } from '@nestjs/passport';
 import { FileFieldsInterceptor } from '@nestjs/platform-express';
 import { Restaurant } from './schemas/restaurants.schema';
 import {
-  ApiBasicAuth,
   ApiBearerAuth,
   ApiBody,
   ApiConsumes,
@@ -74,6 +72,19 @@ export class RestaurantsController {
     }
     const restaurant = await this.restaurantService.findOne(id);
     await this.cacheManager.set(id, restaurant, 60 * 60 * 24);
+    return restaurant;
+  }
+
+  @Patch(':id/status')
+  async changeStatus(@Param('id') id: string, @Query('status') status: number) {
+    const savedRestaurant: Restaurant = await this.cacheManager.get(id);
+
+    const restaurant = await this.restaurantService.changeStatus(id, status);
+
+    if (savedRestaurant) {
+      await this.cacheManager.set(id, restaurant, 60 * 60 * 24);
+    }
+
     return restaurant;
   }
 
@@ -238,7 +249,7 @@ export class RestaurantsController {
   async addMenu(@Param('id') id: string, @Body() createMenusDto: CreateMenusDto) {
     const savedRestaurant: Restaurant = await this.cacheManager.get(id);
 
-    const restaurant = this.restaurantService.addMenu(id, createMenusDto);
+    const restaurant = await this.restaurantService.addMenu(id, createMenusDto);
 
     if (savedRestaurant) {
       await this.cacheManager.set(id, restaurant, 60 * 60 * 24);
@@ -362,6 +373,12 @@ export class RestaurantsController {
   @Roles(UserRole.RESTAURANT_MANAGER)
   @Post(':id/categories')
   async addCategory(@Param('id') id: string, @Query('category') category: string) {
-    return await this.restaurantService.addCategory(id, category);
+    const savedRestaurant: Restaurant = await this.cacheManager.get(id);
+
+    const restaurant = await this.restaurantService.addCategory(id, category);
+    if (savedRestaurant) {
+      await this.cacheManager.set(id, restaurant, 60 * 60 * 24);
+    }
+    return restaurant;
   }
 }

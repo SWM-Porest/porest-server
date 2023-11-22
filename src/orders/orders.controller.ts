@@ -131,7 +131,7 @@ export class OrdersController {
   @ApiQuery({
     name: 'status',
     required: true,
-    description: '주문 상태 (1: 주문완료, 2: 조리중, 3: 조리완료, 4: 서빙완료, 5: 결제완료)',
+    description: '주문 상태 (0: 주문 취소, 1: 주문완료, 2: 조리중, 3: 조리완료, 4: 서빙완료, 5: 결제완료)',
   })
   @Get('/restaurant/:id')
   async getOrdersByRestaurant(
