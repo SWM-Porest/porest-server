@@ -4,6 +4,7 @@ import {
   Delete,
   Get,
   HttpStatus,
+  Inject,
   Param,
   Patch,
   Post,
@@ -15,11 +16,9 @@ import {
 import { RestaurantsService } from './restaurants.service';
 import { CreateMenuOptionsDto, CreateMenusDto, CreateRestaurantsDto } from './dto/create-restaurants.dto';
 import { UpdateMenuOptionsDto, UpdateMenusDto, UpdateRestaurantsDto } from './dto/update-restaurants.dto';
-import { AuthGuard } from '@nestjs/passport';
 import { FileFieldsInterceptor } from '@nestjs/platform-express';
 import { Restaurant } from './schemas/restaurants.schema';
 import {
-  ApiBasicAuth,
   ApiBearerAuth,
   ApiBody,
   ApiConsumes,
@@ -29,17 +28,21 @@ import {
   ApiResponse,
   ApiTags,
 } from '@nestjs/swagger';
-import { Http } from 'winston/lib/winston/transports';
 import { JwtAuthGuard } from 'src/auth/guard/jwt-auth.guard';
 import { RolesGuard } from 'src/auth/guard/roles.guard';
 import { Roles } from 'src/auth/decorator/roles.decorator';
 import { UserRole } from 'src/auth/schemas/user.schema';
+import { Cache } from 'cache-manager';
+import { CACHE_MANAGER } from '@nestjs/cache-manager';
 
 @Controller('restaurants')
 @ApiTags('매장 API')
 @UseGuards(JwtAuthGuard, RolesGuard)
 export class RestaurantsController {
-  constructor(private readonly restaurantService: RestaurantsService) {}
+  constructor(
+    private readonly restaurantService: RestaurantsService,
+    @Inject(CACHE_MANAGER) private cacheManager: Cache,
+  ) {}
 
   @ApiOperation({
     summary: '매장 목록 조회',
@@ -63,7 +66,26 @@ export class RestaurantsController {
   })
   @Get(':id')
   async findOneRestaurant(@Param('id') id: string): Promise<Restaurant> {
-    return await this.restaurantService.findOne(id);
+    const savedRestaurant: Restaurant = await this.cacheManager.get(id);
+    if (savedRestaurant) {
+      return savedRestaurant;
+    }
+    const restaurant = await this.restaurantService.findOne(id);
+    await this.cacheManager.set(id, restaurant, 60 * 60 * 24);
+    return restaurant;
+  }
+
+  @Patch(':id/status')
+  async changeStatus(@Param('id') id: string, @Query('status') status: number) {
+    const savedRestaurant: Restaurant = await this.cacheManager.get(id);
+
+    const restaurant = await this.restaurantService.changeStatus(id, status);
+
+    if (savedRestaurant) {
+      await this.cacheManager.set(id, restaurant, 60 * 60 * 24);
+    }
+
+    return restaurant;
   }
 
   @ApiOperation({
@@ -161,7 +183,20 @@ export class RestaurantsController {
     @Param('id') id: string,
     @Body() updateRestaurantsDto: UpdateRestaurantsDto,
   ): Promise<Restaurant> {
-    return this.restaurantService.update(id, updateRestaurantsDto);
+    const restaurant = this.restaurantService.update(id, updateRestaurantsDto);
+    const savedRestaurant: Restaurant = await this.cacheManager.get(id);
+    if (savedRestaurant) {
+      savedRestaurant.name = updateRestaurantsDto.name;
+      savedRestaurant.phone_number = updateRestaurantsDto.phone_number;
+      savedRestaurant.address = updateRestaurantsDto.address;
+      savedRestaurant.intro = updateRestaurantsDto.intro;
+      if (Array.isArray(updateRestaurantsDto.banner_images) && updateRestaurantsDto.banner_images.length > 0)
+        savedRestaurant.banner_images = updateRestaurantsDto.banner_images;
+
+      await this.cacheManager.set(id, savedRestaurant, 60 * 60 * 24);
+    }
+
+    return restaurant;
   }
 
   @ApiOperation({
@@ -212,7 +247,15 @@ export class RestaurantsController {
   @Roles(UserRole.RESTAURANT_MANAGER)
   @Post(':id/menus')
   async addMenu(@Param('id') id: string, @Body() createMenusDto: CreateMenusDto) {
-    return await this.restaurantService.addMenu(id, createMenusDto);
+    const savedRestaurant: Restaurant = await this.cacheManager.get(id);
+
+    const restaurant = await this.restaurantService.addMenu(id, createMenusDto);
+
+    if (savedRestaurant) {
+      await this.cacheManager.set(id, restaurant, 60 * 60 * 24);
+    }
+
+    return restaurant;
   }
 
   @ApiOperation({
@@ -228,7 +271,15 @@ export class RestaurantsController {
   @Roles(UserRole.RESTAURANT_MANAGER)
   @Patch(':id/menus')
   async updateMenu(@Param('id') id: string, @Body() updateMenusDto: UpdateMenusDto) {
-    return await this.restaurantService.updateMenu(id, updateMenusDto);
+    const savedRestaurant: Restaurant = await this.cacheManager.get(id);
+
+    const restaurant = await this.restaurantService.updateMenu(id, updateMenusDto);
+
+    if (savedRestaurant) {
+      await this.cacheManager.set(id, restaurant, 60 * 60 * 24);
+    }
+
+    return restaurant;
   }
 
   @ApiOperation({
@@ -240,7 +291,15 @@ export class RestaurantsController {
   @Roles(UserRole.RESTAURANT_MANAGER)
   @Delete(':id/menus/:menuId')
   async deleteMenu(@Param('id') id: string, @Param('menuId') menuId: string) {
-    return await this.restaurantService.deleteMenu(id, menuId);
+    const savedRestaurant: Restaurant = await this.cacheManager.get(id);
+
+    const restaurant = await this.restaurantService.deleteMenu(id, menuId);
+
+    if (savedRestaurant) {
+      await this.cacheManager.del(id);
+    }
+
+    return restaurant;
   }
 
   @ApiOperation({
@@ -314,6 +373,12 @@ export class RestaurantsController {
   @Roles(UserRole.RESTAURANT_MANAGER)
   @Post(':id/categories')
   async addCategory(@Param('id') id: string, @Query('category') category: string) {
-    return await this.restaurantService.addCategory(id, category);
+    const savedRestaurant: Restaurant = await this.cacheManager.get(id);
+
+    const restaurant = await this.restaurantService.addCategory(id, category);
+    if (savedRestaurant) {
+      await this.cacheManager.set(id, restaurant, 60 * 60 * 24);
+    }
+    return restaurant;
   }
 }

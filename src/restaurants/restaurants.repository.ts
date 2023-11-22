@@ -103,6 +103,7 @@ export class RestaurantRepository {
     if (updateMenusDto.menuOptions) {
       for (const option of updateMenusDto.menuOptions) {
         if (!option._id) option._id = new Types.ObjectId();
+        else option._id = new Types.ObjectId(option._id);
       }
     }
 
@@ -130,6 +131,14 @@ export class RestaurantRepository {
         { new: true },
       )
       .exec();
+  }
+
+  async changeStatus(_id: string, status: number): Promise<Restaurant> {
+    return await this.restaurantModel.findByIdAndUpdate(
+      new Types.ObjectId(_id),
+      { $set: { status: status } },
+      { new: true },
+    );
   }
 
   async updateMenuOption(_id: string, menuId: string, updateMenuOptionDto: UpdateMenuOptionsDto): Promise<Restaurant> {
